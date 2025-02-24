@@ -6,27 +6,50 @@ PushScripts supercharges your git workflow with AI. Stop writing commit messages
 
 ## Features ✨
 
-- 🧠 **AI-Powered**: Smart commit messages that understand your code changes
-- ⚡ **Save Time**: Focus on coding, let AI handle the git documentation
-- 📝 **Professional Commits**: Perfect conventional commit format every time
-- 🔒 **Security First**: Automatic sensitive file detection
-- 🚀 **Dead Simple**: Just use `push` instead of `git push` and `commit` instead of `git commit`
-- 🔄 **Flexible**: Support for multiple LLM providers (OpenAI, Groq)
+- 🧠 **AI-First Design**: Leverages OpenAI or Groq to deeply understand your code changes and generate perfect commit messages
+- 🚀 **Zero Config Required**: Works immediately with basic commit messages, seamlessly upgrades to AI when you're ready
+- 📝 **Smart Commits**: Analyzes code context, detects components, and generates meaningful conventional commit messages
+- ⚡ **Developer Flow**: Focus on coding while AI handles the documentation overhead
+- 🔒 **Security First**: Automatic detection of sensitive files and environment variables
+- 🎯 **Context Aware**: Understands your project structure, components, and features for better commit messages
+- 🔄 **Provider Flexibility**: Choose between OpenAI and Groq, with smart fallbacks if AI is unavailable
+- 💡 **Best Practices**: Enforces conventional commit format and git workflow standards
 
-## Installation 📦
+## Quickstart 🚀
 
+1. **Install globally:**
 ```bash
-# Install globally via pnpm
 pnpm add -g pushscripts
 ```
 
-That's it! PushScripts works out of the box with basic commit message generation.
+2. **Start using immediately:**
+```bash
+# Works out of the box with basic commit messages
+git add .
+push  # or 'commit' if you don't want to push
+```
 
-For AI-powered smart commits (optional):
-1. Choose your provider by setting `PUSHSCRIPTS_MODEL_PROVIDER` to either `openai` or `groq`
-2. Add the corresponding API key (`OPENAI_API_KEY` or `GROQ_API_KEY`) to your environment
+3. **Enable AI features (recommended):**
+```bash
+# Choose your preferred AI provider
+echo "PUSHSCRIPTS_MODEL_PROVIDER=openai" >> .env
+# Add your API key
+echo "OPENAI_API_KEY=your-key-here" >> .env
+```
 
-You can add these to your `.env` file or your shell's configuration file (`.bashrc`, `.zshrc`, etc.).
+4. **Enjoy smart commits:**
+```bash
+git add .
+push
+
+# PushScripts will now:
+# 1. Analyze your changes with AI
+# 2. Generate a perfect conventional commit
+# 3. Show you for review
+# 4. Commit and push when approved
+```
+
+That's it! PushScripts is now supercharging your git workflow. It works without AI configuration, but we recommend setting up AI features to get the full experience.
 
 ## Usage 🚀
 
@@ -49,48 +72,6 @@ PushScripts will:
 3. Generate a professional commit message
 4. Show you for review
 5. Commit and push when approved
-
-## Development 🛠️
-
-```bash
-# Clone the repository
-git clone https://github.com/caterpillarC15/pushscripts.git
-
-# Install dependencies
-cd pushscripts
-pnpm install
-
-# Create your .env file
-cp .env.example .env
-# Edit .env with your API key
-
-# Run in development mode
-pnpm run dev
-```
-
-### Branch Structure 🌳
-
-We maintain a single main branch:
-- `main`: Production and development code
-
-Development Workflow:
-1. Create feature branches from `main` for new features
-2. Submit pull requests to merge changes back into `main`
-3. Keep commits clean and conventional using PushScripts
-4. Ensure all tests pass before merging
-
-### Project Structure 📁
-
-```
-pushscripts/
-├── src/
-│   ├── core/
-│   │   ├── index.js     # Core functionality
-│   │   └── cli.js       # CLI interface
-│   └── website/         # Documentation website
-├── docs/               # Additional documentation
-└── README.md
-```
 
 ## Examples 📝
 
@@ -155,6 +136,48 @@ DEBUG=pushscripts:*
    - Set `PUSHSCRIPTS_MODEL_PROVIDER=groq`
    - Requires `GROQ_API_KEY` in your environment
    - Default model: mixtral-8x7b-chat
+
+## Development 🛠️
+
+```bash
+# Clone the repository
+git clone https://github.com/caterpillarC15/pushscripts.git
+
+# Install dependencies
+cd pushscripts
+pnpm install
+
+# Create your .env file
+cp .env.example .env
+# Edit .env with your API key
+
+# Run in development mode
+pnpm run dev
+```
+
+### Branch Structure 🌳
+
+We maintain a single main branch:
+- `main`: Production and development code
+
+Development Workflow:
+1. Create feature branches from `main` for new features
+2. Submit pull requests to merge changes back into `main`
+3. Keep commits clean and conventional using PushScripts
+4. Ensure all tests pass before merging
+
+### Project Structure 📁
+
+```
+pushscripts/
+├── src/
+│   ├── core/
+│   │   ├── index.js     # Core functionality
+│   │   └── cli.js       # CLI interface
+│   └── website/         # Documentation website
+├── docs/               # Additional documentation
+└── README.md
+```
 
 ## Contributing 🤝
 
