@@ -18,14 +18,13 @@ PushScripts supercharges your git workflow with AI. Stop writing commit messages
 ```bash
 # Install globally via pnpm
 pnpm add -g pushscripts
-
-# Set your preferred provider
-export PUSHSCRIPTS_MODEL_PROVIDER=openai  # or 'groq'
 ```
 
-If you haven't set up your API keys yet:
-1. Get an API key from [OpenAI](https://platform.openai.com) or [Groq](https://console.groq.com)
-2. Add it to your environment as `OPENAI_API_KEY` or `GROQ_API_KEY` depending on your chosen provider
+Before using PushScripts:
+1. Choose your provider by setting `PUSHSCRIPTS_MODEL_PROVIDER` to either `openai` or `groq` in your environment
+2. Make sure you have the corresponding API key (`OPENAI_API_KEY` or `GROQ_API_KEY`) in your environment
+
+You can add these to your `.env` file or your shell's configuration file (`.bashrc`, `.zshrc`, etc.).
 
 ## Usage 🚀
 
