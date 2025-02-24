@@ -19,13 +19,13 @@ PushScripts supercharges your git workflow with AI. Stop writing commit messages
 # Install globally via pnpm
 pnpm add -g pushscripts
 
-# That's it! PushScripts automatically uses your existing API keys
-# Just use 'push' or 'commit' in any git repository
+# Set your preferred provider
+export PUSHSCRIPTS_MODEL_PROVIDER=openai  # or 'groq'
 ```
 
-If you don't have an API key in your environment yet:
+If you haven't set up your API keys yet:
 1. Get an API key from [OpenAI](https://platform.openai.com) or [Groq](https://console.groq.com)
-2. Add it to your environment as `OPENAI_API_KEY` or `GROQ_API_KEY`
+2. Add it to your environment as `OPENAI_API_KEY` or `GROQ_API_KEY` depending on your chosen provider
 
 ## Usage 🚀
 
@@ -71,13 +71,17 @@ push
 
 ## Configuration ⚙️
 
-PushScripts will automatically use your existing API keys:
+Tell PushScripts which provider to use:
 
 ```bash
-# If you already have OPENAI_API_KEY in your env, it just works!
+# Choose your provider (required)
+PUSHSCRIPTS_MODEL_PROVIDER=openai  # if using OpenAI
+# or
+PUSHSCRIPTS_MODEL_PROVIDER=groq    # if using Groq
 
-# If you have GROQ_API_KEY and want to use Groq instead:
-PUSHSCRIPTS_MODEL_PROVIDER=groq
+# PushScripts will look for the corresponding API key:
+# - OPENAI_API_KEY for OpenAI
+# - GROQ_API_KEY for Groq
 ```
 
 ### Advanced Configuration 🛠️
@@ -99,13 +103,14 @@ DEBUG=pushscripts:*
 
 ### Supported LLM Providers 🤖
 
-1. **OpenAI** (default)
-   - Uses your existing `OPENAI_API_KEY`
+1. **OpenAI**
+   - Set `PUSHSCRIPTS_MODEL_PROVIDER=openai`
+   - Requires `OPENAI_API_KEY` in your environment
    - Default model: gpt-4-turbo-preview
 
 2. **Groq**
-   - Uses your existing `GROQ_API_KEY`
-   - Set `PUSHSCRIPTS_MODEL_PROVIDER=groq` to enable
+   - Set `PUSHSCRIPTS_MODEL_PROVIDER=groq`
+   - Requires `GROQ_API_KEY` in your environment
    - Default model: mixtral-8x7b-chat
 
 ## Development 🛠️
