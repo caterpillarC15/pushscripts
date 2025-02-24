@@ -25,28 +25,27 @@ pnpm add -g pushscripts
 2. **Start using immediately:**
 ```bash
 # Works out of the box with basic commit messages
-git add .
 push  # or 'commit' if you don't want to push
 ```
 
 3. **Enable AI features (recommended):**
 ```bash
-# Choose your preferred AI provider
-echo "PUSHSCRIPTS_MODEL_PROVIDER=openai" >> .env
+# Choose your preferred AI provider in your environment
+PUSHSCRIPTS_MODEL_PROVIDER=openai
 # Add your API key
-echo "OPENAI_API_KEY=your-key-here" >> .env
+OPENAI_API_KEY=your-key-here
 ```
 
 4. **Enjoy smart commits:**
 ```bash
-git add .
 push
 
 # PushScripts will now:
-# 1. Analyze your changes with AI
-# 2. Generate a perfect conventional commit
-# 3. Show you for review
-# 4. Commit and push when approved
+# 1. Add all changes (git add .)
+# 2. Analyze your changes with AI
+# 3. Generate a perfect conventional commit
+# 4. Show you for review
+# 5. Commit and push when approved
 ```
 
 That's it! PushScripts is now supercharging your git workflow. It works without AI configuration, but we recommend setting up AI features to get the full experience.
@@ -56,9 +55,6 @@ That's it! PushScripts is now supercharging your git workflow. It works without 
 Replace `git push` with `push` and `git commit` with `commit`:
 
 ```bash
-# Stage your changes
-git add .
-
 # Option 1: Generate commit message and commit
 commit
 
@@ -67,17 +63,17 @@ push
 ```
 
 PushScripts will:
-1. Check for sensitive files
-2. Analyze your changes
-3. Generate a professional commit message
-4. Show you for review
-5. Commit and push when approved
+1. Add all changes automatically
+2. Check for sensitive files
+3. Analyze your changes
+4. Generate a professional commit message
+5. Show you for review
+6. Commit and push when approved
 
 ## Examples 📝
 
 ```bash
 # Example 1: Commit only
-git add .
 commit
 
 # PushScripts: Analyzes and generates commit
@@ -85,7 +81,6 @@ commit
 ✓ Changes committed successfully!
 
 # Example 2: Commit and push
-git add .
 push
 
 # PushScripts: Analyzes, commits, and pushes
