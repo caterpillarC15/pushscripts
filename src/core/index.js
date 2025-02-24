@@ -7,11 +7,18 @@ class PushScriptsModel {
     this.apiKey = apiKey;
     this.defaultBranch = process.env.GIT_DEFAULT_BRANCH || 'main';
     
+    // Default models by provider
+    this.defaultModels = {
+      openai: 'gpt-4-turbo-preview', // Latest model as of Feb 2024
+      groq: 'mixtral-8x7b-chat'      // Latest Groq model
+    };
+    
     if (process.env.DEBUG === 'pushscripts:*') {
       debug('PushScripts initialized with config:', {
         defaultBranch: this.defaultBranch,
-        model: process.env.COMMIT_MESSAGE_MODEL || 'gpt-3.5-turbo',
-        temperature: process.env.COMMIT_MESSAGE_TEMPERATURE || 0.3
+        provider: process.env.PUSHSCRIPTS_MODEL_PROVIDER || 'openai',
+        model: process.env.PUSHSCRIPTS_MODEL || this.defaultModels.openai,
+        temperature: process.env.PUSHSCRIPTS_TEMPERATURE || 0.3
       });
     }
   }
@@ -203,9 +210,9 @@ Return ONLY the commit message, nothing else.`;
   }
 
   async callLLMAPI(changesDescription, diff) {
-    const provider = process.env.LLM_PROVIDER || 'openai';
-    const model = process.env.COMMIT_MESSAGE_MODEL || 'gpt-3.5-turbo';
-    const temperature = parseFloat(process.env.COMMIT_MESSAGE_TEMPERATURE) || 0.3;
+    const provider = process.env.PUSHSCRIPTS_MODEL_PROVIDER || 'openai';
+    const model = process.env.PUSHSCRIPTS_MODEL || this.defaultModels[provider];
+    const temperature = parseFloat(process.env.PUSHSCRIPTS_TEMPERATURE) || 0.3;
     
     debug('Calling LLM API with config:', { provider, model, temperature });
     debug('Changes:', changesDescription);
@@ -217,7 +224,8 @@ Return ONLY the commit message, nothing else.`;
         endpoint = 'https://api.openai.com/v1/chat/completions';
         headers = {
           'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'OpenAI-Beta': 'assistants=v1'  // Enable latest features
         };
         body = {
           model,
@@ -234,7 +242,8 @@ Return ONLY the commit message, nothing else.`;
           temperature,
           max_tokens: 60,
           presence_penalty: 0,
-          frequency_penalty: 0
+          frequency_penalty: 0,
+          response_format: { type: "text" }  // Ensure plain text response
         };
         break;
 
