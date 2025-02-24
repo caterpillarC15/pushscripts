@@ -1,4 +1,3 @@
-
 <div align="center">
   <a href="https://www.pushscripts.com">
     <img src="website/assets/images/logo.svg" alt="PushScripts Logo" width="400" />
@@ -19,13 +18,13 @@ PushScripts is an open-source tool that supercharges your git workflow with AI. 
 
 ## Features ✨
 
-- 🧠 **AI-First Design**: Leverages OpenAI or Groq to deeply understand your code changes and generate perfect commit messages
+- 🧠 **AI-First Design**: Uses your preferred AI provider to deeply understand your code changes and generate perfect commit messages
 - 🚀 **Zero Config Required**: Works immediately with basic commit messages, seamlessly upgrades to AI when you're ready
 - 📝 **Smart Commits**: Analyzes code context, detects components, and generates meaningful conventional commit messages
 - ⚡ **Developer Flow**: Focus on coding while AI handles the documentation overhead
 - 🔒 **Security First**: Automatic detection of sensitive files and environment variables
 - 🎯 **Context Aware**: Understands your project structure, components, and features for better commit messages
-- 🔄 **Provider Flexibility**: Choose between OpenAI and Groq, with smart fallbacks if AI is unavailable
+- 🔄 **Provider Flexibility**: Use any supported AI provider, with smart fallbacks if AI is unavailable
 - 💡 **Best Practices**: Enforces conventional commit format and git workflow standards
 
 ## Quickstart 🚀
@@ -44,9 +43,9 @@ push  # or 'commit' if you don't want to push
 3. **Enable AI features (recommended):**
 ```bash
 # Choose your preferred AI provider in your environment
-PUSHSCRIPTS_MODEL_PROVIDER=openai
+PUSHSCRIPTS_MODEL_PROVIDER=your_provider
 # Add your API key
-OPENAI_API_KEY=your-key-here
+YOUR_PROVIDER_API_KEY=your-key-here
 ```
 
 4. **Enjoy smart commits:**
@@ -103,17 +102,14 @@ push
 
 ## Configuration ⚙️
 
-PushScripts works without any configuration, but you can enable AI-powered commits by setting up a provider:
+PushScripts works without any configuration, but you can enable AI-powered commits by setting up your preferred provider:
 
 ```bash
-# Optional: Enable AI-powered commits by choosing a provider
-PUSHSCRIPTS_MODEL_PROVIDER=openai  # if using OpenAI
-# or
-PUSHSCRIPTS_MODEL_PROVIDER=groq    # if using Groq
+# Optional: Enable AI-powered commits by setting your provider
+PUSHSCRIPTS_MODEL_PROVIDER=your_provider
 
-# And adding the corresponding API key:
-# - OPENAI_API_KEY for OpenAI
-# - GROQ_API_KEY for Groq
+# And adding your provider's API key:
+YOUR_PROVIDER_API_KEY=your-key-here
 ```
 
 ### Advanced Configuration 🛠️
@@ -121,10 +117,8 @@ PUSHSCRIPTS_MODEL_PROVIDER=groq    # if using Groq
 Additional settings are available but completely optional:
 
 ```bash
-# Optional: Customize model selection
-PUSHSCRIPTS_MODEL=gpt-4-turbo-preview  # For OpenAI
-# or
-PUSHSCRIPTS_MODEL=mixtral-8x7b-chat    # For Groq
+# Optional: Customize model selection for your provider
+PUSHSCRIPTS_MODEL=your-preferred-model
 
 # Optional: Fine-tune generation
 PUSHSCRIPTS_TEMPERATURE=0.3  # Lower = more focused
@@ -217,17 +211,21 @@ When a sensitive file is detected, PushScripts will:
 2. Show which files were flagged as sensitive
 3. Provide instructions for handling sensitive files
 
-### Supported LLM Providers 🤖
+### Supported AI Providers 🤖
 
-1. **OpenAI**
-   - Set `PUSHSCRIPTS_MODEL_PROVIDER=openai`
-   - Requires `OPENAI_API_KEY` in your environment
-   - Default model: gpt-4-turbo-preview
+PushScripts supports various AI providers through a flexible integration system. Choose the provider that best fits your needs:
 
-2. **Groq**
-   - Set `PUSHSCRIPTS_MODEL_PROVIDER=groq`
-   - Requires `GROQ_API_KEY` in your environment
-   - Default model: mixtral-8x7b-chat
+1. **Default Providers**
+   - Set `PUSHSCRIPTS_MODEL_PROVIDER` to your chosen provider
+   - Add the corresponding API key to your environment
+   - Each provider may have different default models and capabilities
+
+2. **Provider Configuration**
+   - Configure model selection with `PUSHSCRIPTS_MODEL`
+   - Adjust temperature and other settings as needed
+   - Fallback to basic commit messages if AI is unavailable
+
+Check our [documentation](https://www.pushscripts.com) for the latest list of supported providers and their specific configuration options.
 
 ## Development 🛠️
 
@@ -288,7 +286,7 @@ Need help? We've got you:
 
 ## Acknowledgments 🙏
 
-- [OpenAI](https://openai.com) and [Groq](https://groq.com) for their powerful LLM APIs
+- The AI provider community for their powerful language models
 - The open-source community for inspiration and support
 
 ---
