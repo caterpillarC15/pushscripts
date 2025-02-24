@@ -18,14 +18,14 @@ PushScripts is an open-source tool that supercharges your git workflow with AI. 
 
 ## Features ✨
 
-- 🧠 **AI-First Design**: Uses your preferred AI provider to deeply understand your code changes and generate perfect commit messages
-- 🚀 **Zero Config Required**: Works immediately with basic commit messages, seamlessly upgrades to AI when you're ready
-- 📝 **Smart Commits**: Analyzes code context, detects components, and generates meaningful conventional commit messages
-- ⚡ **Developer Flow**: Focus on coding while AI handles the documentation overhead
-- 🔒 **Security First**: Automatic detection of sensitive files and environment variables
-- 🎯 **Context Aware**: Understands your project structure, components, and features for better commit messages
-- 🔄 **Provider Flexibility**: Use any supported AI provider, with smart fallbacks if AI is unavailable
-- 💡 **Best Practices**: Enforces conventional commit format and git workflow standards
+- **AI-First Design**: Uses your preferred AI provider to deeply understand your code changes and generate perfect commit messages
+- **Zero Config Required**: Works immediately with basic commit messages, seamlessly upgrades to AI when you're ready
+- **Smart Commits**: Analyzes code context, detects components, and generates meaningful conventional commit messages
+- **Developer Flow**: Focus on coding while AI handles the documentation overhead
+- **Security First**: Automatic detection of sensitive files and environment variables
+- **Context Aware**: Understands your project structure, components, and features for better commit messages
+- **Provider Flexibility**: Use any supported AI provider, with smart fallbacks if AI is unavailable
+- **Best Practices**: Enforces conventional commit format and git workflow standards
 
 ## Quickstart 🚀
 
@@ -45,14 +45,14 @@ push  # or 'commit' if you don't want to push
 # Example 1: Using OpenAI
 # First, set your API key
 OPENAI_API_KEY=your-key-here
-# Then configure PushScripts (optional)
+# Then configure PushScripts
 PUSHSCRIPTS_MODEL_PROVIDER=openai
 PUSHSCRIPTS_MODEL=gpt-4-turbo-preview  # optional
 
 # Example 2: Using Anthropic
 # First, set your API key
 ANTHROPIC_API_KEY=your-key-here
-# Then configure PushScripts (optional)
+# Then configure PushScripts
 PUSHSCRIPTS_MODEL_PROVIDER=anthropic
 PUSHSCRIPTS_MODEL=claude-3-opus  # optional
 ```
