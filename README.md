@@ -4,7 +4,7 @@
   </a>
 
   <p align="center">
-    <a href="https://www.pushscripts.com">Website</a>
+    <span>Website (Coming Soon)</span>
     ·
     <a href="https://github.com/caterpillarC15/pushscripts/issues">Report Bug</a>
     ·
