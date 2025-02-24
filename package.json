@@ -2,47 +2,107 @@
   "name": "pushscripts",
   "version": "1.0.0",
   "description": "Ship code faster with AI-powered git commands. Smart commit messages that understand your code.",
-  "main": "src/core/index.js",
+  "private": false,
+  "type": "commonjs",
+  "main": "dist/core/index.js",
+  "types": "dist/core/index.d.ts",
   "bin": {
-    "push": "./src/core/cli.js",
-    "commit": "./src/core/cli.js"
+    "push": "./dist/core/cli.js",
+    "commit": "./dist/core/cli.js"
   },
+  "files": [
+    "dist/core/index.js",
+    "dist/core/index.d.ts",
+    "dist/core/cli.js",
+    "dist/core/cli.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "start": "node src/core/cli.js",
-    "dev": "nodemon src/core/cli.js",
+    "start": "node dist/core/cli.js",
+    "dev": "ts-node src/core/cli.ts",
     "serve-docs": "npx serve website",
     "test": "jest",
     "firebase:login": "firebase login",
     "firebase:init": "firebase init",
     "firebase:serve": "firebase serve",
     "firebase:deploy": "firebase deploy",
-    "build": "pnpm install && cp -r website/* public/",
-    "push": "node src/core/cli.js",
-    "commit": "node src/core/cli.js"
+    "build": "tsc",
+    "prebuild": "rimraf dist",
+    "prepare": "npm run build && chmod +x dist/core/cli.js",
+    "prepublishOnly": "npm test",
+    "postinstall": "node -e \"try { require('fs').chmodSync('./dist/core/cli.js', '755') } catch(e) {}\"",
+    "type-check": "tsc --noEmit",
+    "watch": "tsc -w"
   },
   "keywords": [
     "git",
     "automation",
     "ai",
     "commit-messages",
-    "developer-tools"
+    "developer-tools",
+    "conventional-commits",
+    "git-automation",
+    "cli",
+    "productivity",
+    "workflow",
+    "openai",
+    "anthropic",
+    "llm",
+    "artificial-intelligence",
+    "version-control",
+    "typescript"
   ],
-  "author": "",
+  "author": "caterpillarC15",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/caterpillarC15/pushscripts.git"
+  },
+  "homepage": "https://www.pushscripts.com",
+  "bugs": {
+    "url": "https://github.com/caterpillarC15/pushscripts/issues"
+  },
   "dependencies": {
+    "debug": "^4.3.4",
     "dotenv": "^16.0.3",
-    "node-fetch": "^2.6.7",
-    "debug": "^4.3.4"
+    "node-fetch": "^2.6.7"
   },
   "devDependencies": {
+    "@types/debug": "^4.1.12",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.17.19",
+    "@types/node-fetch": "^2.6.11",
+    "firebase-tools": "^13.0.0",
     "jest": "^29.0.0",
     "nodemon": "^2.0.20",
+    "rimraf": "^5.0.5",
     "serve": "^14.0.0",
-    "firebase-tools": "^13.0.0"
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "git-core": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "git-core": {
+      "optional": false
+    }
   },
   "packageManager": "pnpm@8.15.4",
   "engines": {
-    "node": ">=16",
-    "pnpm": ">=8"
-  }
-} 
+    "node": ">=16.14.0",
+    "pnpm": ">=8.0.0",
+    "git": ">=2.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ]
+}
