@@ -1,4 +1,18 @@
-# PushScripts 🚀
+# PushScripts 
+
+<div align="center">
+  <a href="https://www.pushscripts.com">
+    <img src="website/assets/images/logo.svg" alt="PushScripts Logo" width="400" />
+  </a>
+
+  <p align="center">
+    <a href="https://www.pushscripts.com">Website</a>
+    ·
+    <a href="https://github.com/caterpillarC15/pushscripts/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/caterpillarC15/pushscripts/issues">Request Feature</a>
+  </p>
+</div>
 
 > Ship code faster with AI-powered git commands
 
