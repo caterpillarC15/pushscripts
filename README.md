@@ -16,20 +16,16 @@ PushScripts supercharges your git workflow with AI. Stop writing commit messages
 ## Installation 📦
 
 ```bash
-# Install globally via pnpm (recommended)
+# Install globally via pnpm
 pnpm add -g pushscripts
 
-# Create a .env file in your project (recommended)
-cp .env.example .env
-# Edit .env with your API key
-
-# Or set up globally (alternative)
-echo "OPENAI_API_KEY=your-api-key" > ~/.pushscripts-rc
-# or for Groq
-echo "GROQ_API_KEY=your-api-key" > ~/.pushscripts-rc
+# That's it! PushScripts automatically uses your existing API keys
+# Just use 'push' or 'commit' in any git repository
 ```
 
-The `.env` file takes precedence over the global configuration. This allows you to use different settings per project.
+If you don't have an API key in your environment yet:
+1. Get an API key from [OpenAI](https://platform.openai.com) or [Groq](https://console.groq.com)
+2. Add it to your environment as `OPENAI_API_KEY` or `GROQ_API_KEY`
 
 ## Usage 🚀
 
@@ -75,22 +71,26 @@ push
 
 ## Configuration ⚙️
 
-Create a `.pushscripts-rc` file in your home directory or a `.env` file in your project:
+PushScripts will automatically use your existing API keys:
 
 ```bash
-# Required: Your API key (choose one)
-OPENAI_API_KEY=your-api-key
+# If you already have OPENAI_API_KEY in your env, it just works!
+
+# If you have GROQ_API_KEY and want to use Groq instead:
+PUSHSCRIPTS_MODEL_PROVIDER=groq
+```
+
+### Advanced Configuration 🛠️
+
+Additional settings are available but completely optional:
+
+```bash
+# Optional: Customize model selection
+PUSHSCRIPTS_MODEL=gpt-4-turbo-preview  # For OpenAI
 # or
-GROQ_API_KEY=your-api-key
+PUSHSCRIPTS_MODEL=mixtral-8x7b-chat    # For Groq
 
-# Optional: Choose your LLM provider
-PUSHSCRIPTS_MODEL_PROVIDER=openai  # or 'groq'
-
-# Optional: Customize model and settings
-PUSHSCRIPTS_MODEL=gpt-4-turbo-preview  # OpenAI model (default)
-# or
-PUSHSCRIPTS_MODEL=mixtral-8x7b-chat  # Groq model (default)
-
+# Optional: Fine-tune generation
 PUSHSCRIPTS_TEMPERATURE=0.3  # Lower = more focused
 
 # Optional: Enable debug mode
@@ -99,17 +99,14 @@ DEBUG=pushscripts:*
 
 ### Supported LLM Providers 🤖
 
-PushScripts supports multiple LLM providers for generating commit messages:
-
 1. **OpenAI** (default)
-   - Models: gpt-4-turbo-preview (default), gpt-4, gpt-3.5-turbo
-   - Set `PUSHSCRIPTS_MODEL_PROVIDER=openai` and `OPENAI_API_KEY`
+   - Uses your existing `OPENAI_API_KEY`
+   - Default model: gpt-4-turbo-preview
 
 2. **Groq**
-   - Models: mixtral-8x7b-chat (default), llama2-70b-chat
-   - Set `PUSHSCRIPTS_MODEL_PROVIDER=groq` and `GROQ_API_KEY`
-
-Choose the provider and model that best fits your needs and budget.
+   - Uses your existing `GROQ_API_KEY`
+   - Set `PUSHSCRIPTS_MODEL_PROVIDER=groq` to enable
+   - Default model: mixtral-8x7b-chat
 
 ## Development 🛠️
 
