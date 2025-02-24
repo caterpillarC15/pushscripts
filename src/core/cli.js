@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const readline = require('readline');
+const path = require('path');
 const PushScriptsModel = require('./index');
 require('dotenv').config();
 
@@ -8,7 +9,10 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 async function main() {
   const pushScripts = new PushScriptsModel(OPENAI_API_KEY);
-  const shouldPush = process.argv[1].endsWith('push');
+  // Check both the script name and the command name for 'push'
+  const shouldPush = process.argv[1].endsWith('push') || 
+                    process.argv[1].includes('/push') ||
+                    path.basename(process.argv[1]) === 'push';
   
   try {
     // Get git status for display
