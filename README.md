@@ -27,17 +27,32 @@ PushScripts is an open-source tool that supercharges your git workflow with AI. 
 - **Provider Flexibility**: Use any supported AI provider, with smart fallbacks if AI is unavailable
 - **Best Practices**: Enforces conventional commit format and git workflow standards
 
-## Quickstart 🚀
+## Quickstart
 
-1. **Install globally:**
+1. **Choose your installation:**
 ```bash
+# Option A: Install globally (recommended for personal use)
 pnpm add -g pushscripts
+# Commands 'push' and 'commit' will be available everywhere
+
+# Option B: Install locally (recommended for projects)
+pnpm add -D pushscripts
+# Add to your package.json scripts:
+{
+  "scripts": {
+    "push": "pushscripts push",
+    "commit": "pushscripts commit"
+  }
+}
 ```
 
 2. **Start using immediately:**
 ```bash
-# Works out of the box with basic commit messages
+# If installed globally:
 push  # or 'commit' if you don't want to push
+
+# If installed locally:
+pnpm push  # or 'pnpm commit'
 ```
 
 3. **Enable AI features (recommended):**
