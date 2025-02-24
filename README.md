@@ -10,7 +10,7 @@ PushScripts supercharges your git workflow with AI. Stop writing commit messages
 - ⚡ **Save Time**: Focus on coding, let AI handle the git documentation
 - 📝 **Professional Commits**: Perfect conventional commit format every time
 - 🔒 **Security First**: Automatic sensitive file detection
-- 🚀 **Dead Simple**: Just use `push` instead of `git push`
+- 🚀 **Dead Simple**: Just use `push` instead of `git push` and `commit` instead of `git commit`
 
 ## Installation 📦
 
@@ -24,13 +24,16 @@ echo "GROQ_API_KEY=your-api-key" > ~/.pushscripts-rc
 
 ## Usage 🚀
 
-Replace `git push` with just `push`:
+Replace `git push` with `push` and `git commit` with `commit`:
 
 ```bash
 # Stage your changes
 git add .
 
-# Let AI handle the rest
+# Option 1: Generate commit message and commit
+commit
+
+# Option 2: Generate commit message, commit, and push
 push
 ```
 
@@ -44,12 +47,21 @@ PushScripts will:
 ## Examples 📝
 
 ```bash
-# You: Make some changes and stage them
+# Example 1: Commit only
+git add .
+commit
+
+# PushScripts: Analyzes and generates commit
+✓ "feat(auth): implement OAuth2 login with role-based access"
+✓ Changes committed successfully!
+
+# Example 2: Commit and push
 git add .
 push
 
-# PushScripts: Analyzes and generates perfect commit
-✓ "feat(auth): implement OAuth2 login with role-based access"
+# PushScripts: Analyzes, commits, and pushes
+✓ "feat(api): add user authentication endpoints"
+✓ Changes committed and pushed successfully!
 ```
 
 ## Configuration ⚙️
