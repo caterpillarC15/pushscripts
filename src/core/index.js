@@ -1,11 +1,21 @@
 const { execSync } = require('child_process');
 const fetch = require('node-fetch');
 const debug = require('debug')('pushscripts:*');
+const fs = require('fs');
+const path = require('path');
 
 class PushScriptsModel {
   constructor(apiKey) {
     this.apiKey = apiKey;
     this.defaultBranch = process.env.GIT_DEFAULT_BRANCH || 'main';
+    
+    // Default sensitive file patterns
+    this.defaultSensitivePatterns = [
+      '.env',
+      '.env.*',
+      'credentials.json',
+      'secrets.json'
+    ];
     
     // Default models by provider
     this.defaultModels = {
@@ -109,16 +119,120 @@ class PushScriptsModel {
     return categories;
   }
 
+  getSensitivePatterns() {
+    // Initialize with default patterns
+    let includePatterns = [...this.defaultSensitivePatterns].map(pattern => ({
+      pattern: this.convertToRegex(pattern),
+      original: pattern
+    }));
+    let excludePatterns = [];
+    
+    // Check for .gitignore-sensitive file
+    try {
+      const gitignoreSensitivePath = path.join(process.cwd(), '.gitignore-sensitive');
+      if (fs.existsSync(gitignoreSensitivePath)) {
+        debug('Found .gitignore-sensitive file');
+        const fileContent = fs.readFileSync(gitignoreSensitivePath, 'utf8');
+        
+        fileContent
+          .split('\n')
+          .map(line => line.trim())
+          .filter(line => line && !line.startsWith('#')) // Remove comments and empty lines
+          .forEach(pattern => {
+            if (pattern.startsWith('!')) {
+              // Negation pattern
+              const cleanPattern = pattern.slice(1); // Remove !
+              excludePatterns.push({
+                pattern: this.convertToRegex(cleanPattern),
+                original: cleanPattern
+              });
+              debug('Added exclusion pattern:', cleanPattern);
+            } else {
+              // Include pattern
+              includePatterns.push({
+                pattern: this.convertToRegex(pattern),
+                original: pattern
+              });
+              debug('Added inclusion pattern:', pattern);
+            }
+          });
+      }
+    } catch (error) {
+      debug('Error reading .gitignore-sensitive:', error.message);
+    }
+
+    // Check for environment variable override
+    const envPatterns = process.env.PUSHSCRIPTS_SENSITIVE_FILES;
+    if (envPatterns) {
+      debug('Found PUSHSCRIPTS_SENSITIVE_FILES environment variable');
+      if (envPatterns.startsWith('override:')) {
+        // Override mode: replace all patterns
+        includePatterns = [];
+        excludePatterns = [];
+        envPatterns
+          .slice(9) // Remove 'override:' prefix
+          .split(',')
+          .map(p => p.trim())
+          .filter(p => p)
+          .forEach(pattern => {
+            if (pattern.startsWith('!')) {
+              excludePatterns.push({
+                pattern: this.convertToRegex(pattern.slice(1)),
+                original: pattern.slice(1)
+              });
+            } else {
+              includePatterns.push({
+                pattern: this.convertToRegex(pattern),
+                original: pattern
+              });
+            }
+          });
+        debug('Overriding with patterns:', { include: includePatterns, exclude: excludePatterns });
+      } else {
+        // Append mode: add to existing patterns
+        envPatterns
+          .split(',')
+          .map(p => p.trim())
+          .filter(p => p)
+          .forEach(pattern => {
+            if (pattern.startsWith('!')) {
+              excludePatterns.push({
+                pattern: this.convertToRegex(pattern.slice(1)),
+                original: pattern.slice(1)
+              });
+            } else {
+              includePatterns.push({
+                pattern: this.convertToRegex(pattern),
+                original: pattern
+              });
+            }
+          });
+        debug('Appending patterns:', { include: includePatterns, exclude: excludePatterns });
+      }
+    }
+
+    return { includePatterns, excludePatterns };
+  }
+
+  convertToRegex(pattern) {
+    // Convert gitignore pattern to regex pattern
+    return pattern
+      .replace(/\./g, '\\.') // Escape dots
+      .replace(/\*\*/g, '.*')  // Convert ** to .* (match everything including /)
+      .replace(/\*/g, '[^/]*')  // Convert * to [^/]* (match everything except /)
+      .replace(/\?/g, '.')    // Convert ? to .
+      .replace(/\[!/g, '[^')  // Convert [! to [^
+      .replace(/\[/g, '\\[')  // Escape [
+      .replace(/\]/g, '\\]')  // Escape ]
+      .replace(/\//g, '\\/'); // Escape /
+  }
+
   checkSensitiveFiles() {
-    const sensitivePatterns = [
-      '^.env$',
-      '^.env.local$',
-      '^.env.development$',
-      '^.env.production$',
-      '^.env.test$',
-      'credentials.json',
-      'secrets.json'
-    ];
+    const { includePatterns, excludePatterns } = this.getSensitivePatterns();
+    debug('Checking for sensitive files with patterns:', { 
+      include: includePatterns.map(p => p.original),
+      exclude: excludePatterns.map(p => p.original)
+    });
 
     const status = execSync('git status --porcelain').toString();
     const stagedFiles = status
@@ -126,9 +240,24 @@ class PushScriptsModel {
       .filter(line => line.length > 0)
       .map(line => line.slice(3));
 
-    return stagedFiles.filter(file =>
-      sensitivePatterns.some(pattern => new RegExp(pattern).test(file))
-    );
+    const sensitiveFiles = stagedFiles.filter(file => {
+      // Check if file matches any include pattern
+      const isIncluded = includePatterns.some(({ pattern }) => new RegExp(pattern).test(file));
+      
+      // If included, check if it's explicitly excluded
+      if (isIncluded) {
+        const isExcluded = excludePatterns.some(({ pattern }) => new RegExp(pattern).test(file));
+        return !isExcluded;
+      }
+      
+      return false;
+    });
+
+    if (sensitiveFiles.length > 0) {
+      debug('Found sensitive files:', sensitiveFiles);
+    }
+
+    return sensitiveFiles;
   }
 
   async generateAICommitMessage(changes) {

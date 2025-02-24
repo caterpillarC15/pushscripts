@@ -133,26 +133,37 @@ PushScripts prevents committing sensitive files by default (like `.env`, `creden
    credentials.json
    secrets.json
 
-   # Your custom patterns
-   **/*secret*
+   # Block specific file types
    *.key
+   *.pem
+   *.cert
+   **/secrets/**
    private/*.conf
-   config/*.secret.json
-   
+
+   # Allow exceptions with ! prefix
+   !*.pub.key
+   !example.cert
+   !**/secrets/public/**
+   !private/example.conf
+
+   # Block specific directories but allow examples
+   config/secure/*
+   !config/secure/*.example.json
+
    # Supports standard gitignore patterns:
    # - Use * to match any characters except /
    # - Use ** to match any characters including /
-   # - Lines starting with ! negate the pattern
+   # - Start with ! to exclude from sensitive list
    # - Lines starting with # are comments
    ```
 
 2. **Using Environment Variable** (For quick overrides):
    ```bash
    # Add patterns (comma-separated)
-   PUSHSCRIPTS_SENSITIVE_FILES=**/*secret*,*.key
+   PUSHSCRIPTS_SENSITIVE_FILES=*.key,private/*.conf,!*.pub.key
 
-   # Or override defaults (prefix with override:)
-   PUSHSCRIPTS_SENSITIVE_FILES=override:**/*.pem,**/id_rsa
+   # Or override defaults completely
+   PUSHSCRIPTS_SENSITIVE_FILES=override:**/*.pem,**/id_rsa,!id_rsa.pub
    ```
 
 The `.gitignore-sensitive` approach is recommended because:
@@ -161,6 +172,37 @@ The `.gitignore-sensitive` approach is recommended because:
 - Version controllable (share with team)
 - Easier to maintain long lists
 - More readable format
+- Supports complex pattern matching
+- Allows fine-grained control with negation patterns
+
+**Pattern Matching Examples:**
+```gitignore
+# Block all .key files except public keys
+*.key
+!*.pub.key
+
+# Block entire secrets directory except public files
+secrets/**/*
+!secrets/public/**/*
+
+# Block config files but allow examples
+config/*.json
+!config/*.example.json
+
+# Block deep credential files
+**/credentials/**/*.json
+!**/credentials/**/*.public.json
+
+# Block specific formats in any directory
+**/*.secret.*
+**/*.private.*
+!**/*.example.*
+```
+
+When a sensitive file is detected, PushScripts will:
+1. Stop the commit process
+2. Show which files were flagged as sensitive
+3. Provide instructions for handling sensitive files
 
 ### Supported LLM Providers 🤖
 
