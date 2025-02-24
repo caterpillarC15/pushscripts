@@ -19,8 +19,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "start": "node dist/core/cli.js",
-    "dev": "ts-node src/core/cli.ts",
+    "start": "npx serve website",
+    "dev": "npx serve website",
     "serve-docs": "npx serve website",
     "test": "jest",
     "firebase:login": "firebase login",
@@ -33,7 +33,9 @@
     "prepublishOnly": "npm test",
     "postinstall": "node -e \"try { require('fs').chmodSync('./dist/core/cli.js', '755') } catch(e) {}\"",
     "type-check": "tsc --noEmit",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "push": "node dist/core/cli.js",
+    "commit": "node dist/core/cli.js"
   },
   "keywords": [
     "git",

@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://www.pushscripts.com">
+  <a href="https://pushscripts.web.app">
     <img src="website/assets/images/logo.svg" alt="PushScripts Logo" width="400" />
   </a>
 
