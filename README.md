@@ -20,9 +20,11 @@ PushScripts supercharges your git workflow with AI. Stop writing commit messages
 pnpm add -g pushscripts
 ```
 
-Before using PushScripts:
-1. Choose your provider by setting `PUSHSCRIPTS_MODEL_PROVIDER` to either `openai` or `groq` in your environment
-2. Make sure you have the corresponding API key (`OPENAI_API_KEY` or `GROQ_API_KEY`) in your environment
+That's it! PushScripts works out of the box with basic commit message generation.
+
+For AI-powered smart commits (optional):
+1. Choose your provider by setting `PUSHSCRIPTS_MODEL_PROVIDER` to either `openai` or `groq`
+2. Add the corresponding API key (`OPENAI_API_KEY` or `GROQ_API_KEY`) to your environment
 
 You can add these to your `.env` file or your shell's configuration file (`.bashrc`, `.zshrc`, etc.).
 
@@ -70,15 +72,15 @@ push
 
 ## Configuration ⚙️
 
-Tell PushScripts which provider to use:
+PushScripts works without any configuration, but you can enable AI-powered commits by setting up a provider:
 
 ```bash
-# Choose your provider (required)
+# Optional: Enable AI-powered commits by choosing a provider
 PUSHSCRIPTS_MODEL_PROVIDER=openai  # if using OpenAI
 # or
 PUSHSCRIPTS_MODEL_PROVIDER=groq    # if using Groq
 
-# PushScripts will look for the corresponding API key:
+# And adding the corresponding API key:
 # - OPENAI_API_KEY for OpenAI
 # - GROQ_API_KEY for Groq
 ```
