@@ -120,6 +120,48 @@ PUSHSCRIPTS_TEMPERATURE=0.3  # Lower = more focused
 DEBUG=pushscripts:*
 ```
 
+### Sensitive File Detection 🔒
+
+PushScripts prevents committing sensitive files by default (like `.env`, `credentials.json`). You can customize this in two ways:
+
+1. **Using .gitignore-sensitive** (Recommended):
+   Create a `.gitignore-sensitive` file in your project root:
+   ```gitignore
+   # Default patterns (already included)
+   .env
+   .env.*
+   credentials.json
+   secrets.json
+
+   # Your custom patterns
+   **/*secret*
+   *.key
+   private/*.conf
+   config/*.secret.json
+   
+   # Supports standard gitignore patterns:
+   # - Use * to match any characters except /
+   # - Use ** to match any characters including /
+   # - Lines starting with ! negate the pattern
+   # - Lines starting with # are comments
+   ```
+
+2. **Using Environment Variable** (For quick overrides):
+   ```bash
+   # Add patterns (comma-separated)
+   PUSHSCRIPTS_SENSITIVE_FILES=**/*secret*,*.key
+
+   # Or override defaults (prefix with override:)
+   PUSHSCRIPTS_SENSITIVE_FILES=override:**/*.pem,**/id_rsa
+   ```
+
+The `.gitignore-sensitive` approach is recommended because:
+- Familiar gitignore syntax
+- Can include comments
+- Version controllable (share with team)
+- Easier to maintain long lists
+- More readable format
+
 ### Supported LLM Providers 🤖
 
 1. **OpenAI**
