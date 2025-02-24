@@ -1,4 +1,3 @@
-# PushScripts 
 
 <div align="center">
   <a href="https://www.pushscripts.com">
@@ -16,7 +15,7 @@
 
 > Ship code faster with AI-powered git commands
 
-PushScripts supercharges your git workflow with AI. Stop writing commit messages manually - let AI analyze your changes and craft perfect, conventional commits while you focus on coding. The AI understands your code changes and generates meaningful, standardized commit messages that follow best practices.
+PushScripts is an open-source tool that supercharges your git workflow with AI. No more writing commit messages manually - let AI analyze your changes and craft perfect, conventional commits while you focus on coding. Built by developers for developers, PushScripts is designed to be lightweight, secure, and completely free to use. It works out of the box with basic commit messages and seamlessly upgrades to AI-powered commits when you're ready.
 
 ## Features ✨
 
