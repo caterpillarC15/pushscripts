@@ -50,6 +50,48 @@ PushScripts will:
 4. Show you for review
 5. Commit and push when approved
 
+## Development 🛠️
+
+```bash
+# Clone the repository
+git clone https://github.com/caterpillarC15/pushscripts.git
+
+# Install dependencies
+cd pushscripts
+pnpm install
+
+# Create your .env file
+cp .env.example .env
+# Edit .env with your API key
+
+# Run in development mode
+pnpm run dev
+```
+
+### Branch Structure 🌳
+
+We maintain a single main branch:
+- `main`: Production and development code
+
+Development Workflow:
+1. Create feature branches from `main` for new features
+2. Submit pull requests to merge changes back into `main`
+3. Keep commits clean and conventional using PushScripts
+4. Ensure all tests pass before merging
+
+### Project Structure 📁
+
+```
+pushscripts/
+├── src/
+│   ├── core/
+│   │   ├── index.js     # Core functionality
+│   │   └── cli.js       # CLI interface
+│   └── website/         # Documentation website
+├── docs/               # Additional documentation
+└── README.md
+```
+
 ## Examples 📝
 
 ```bash
@@ -113,48 +155,6 @@ DEBUG=pushscripts:*
    - Set `PUSHSCRIPTS_MODEL_PROVIDER=groq`
    - Requires `GROQ_API_KEY` in your environment
    - Default model: mixtral-8x7b-chat
-
-## Development 🛠️
-
-```bash
-# Clone the repository
-git clone https://github.com/caterpillarC15/pushscripts.git
-
-# Install dependencies
-cd pushscripts
-pnpm install
-
-# Create your .env file
-cp .env.example .env
-# Edit .env with your API key
-
-# Run in development mode
-pnpm run dev
-```
-
-### Branch Structure 🌳
-
-We maintain a single main branch:
-- `main`: Production and development code
-
-Development Workflow:
-1. Create feature branches from `main` for new features
-2. Submit pull requests to merge changes back into `main`
-3. Keep commits clean and conventional using PushScripts
-4. Ensure all tests pass before merging
-
-## Project Structure 📁
-
-```
-pushscripts/
-├── src/
-│   ├── core/
-│   │   ├── index.js     # Core functionality
-│   │   └── cli.js       # CLI interface
-│   └── website/         # Documentation website
-├── docs/               # Additional documentation
-└── README.md
-```
 
 ## Contributing 🤝
 
