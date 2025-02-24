@@ -10,10 +10,48 @@ class GitPushAI {
     if (process.env.DEBUG === 'pushscripts:*') {
       debug('PushScripts initialized with config:', {
         defaultBranch: this.defaultBranch,
-        model: process.env.COMMIT_MESSAGE_MODEL || 'llama2-70b-chat',
+        model: process.env.COMMIT_MESSAGE_MODEL || 'llama-3.3-70b-versatile',
         temperature: process.env.COMMIT_MESSAGE_TEMPERATURE || 0.3
       });
     }
+  }
+
+  addAllChanges() {
+    debug('Adding all changes');
+    execSync('git add .', { stdio: 'inherit' });
+  }
+
+  async commit() {
+    // Add all changes first
+    this.addAllChanges();
+
+    // Check for sensitive files
+    const sensitiveFiles = this.checkSensitiveFiles();
+    if (sensitiveFiles.length > 0) {
+      throw new Error('Sensitive files detected');
+    }
+
+    // Get changes
+    const changes = this.getGitStatus();
+    if (changes.length === 0) {
+      throw new Error('No changes to commit');
+    }
+
+    // Generate message
+    const message = await this.generateAICommitMessage(changes);
+    
+    // Commit
+    execSync(`git commit -m "${message}"`, { stdio: 'inherit' });
+    return message;
+  }
+
+  async push() {
+    // Commit first
+    const message = await this.commit();
+    
+    // Then push
+    execSync('git push', { stdio: 'inherit' });
+    return message;
   }
 
   getGitStatus() {
@@ -66,11 +104,11 @@ class GitPushAI {
 
   checkSensitiveFiles() {
     const sensitivePatterns = [
-      '.env',
-      '.env.local',
-      '.env.development',
-      '.env.production',
-      '.env.test',
+      '^.env$',
+      '^.env.local$',
+      '^.env.development$',
+      '^.env.production$',
+      '^.env.test$',
       'credentials.json',
       'secrets.json'
     ];
@@ -82,7 +120,7 @@ class GitPushAI {
       .map(line => line.slice(3));
 
     return stagedFiles.filter(file =>
-      sensitivePatterns.some(pattern => file.includes(pattern))
+      sensitivePatterns.some(pattern => new RegExp(pattern).test(file))
     );
   }
 
@@ -96,7 +134,7 @@ class GitPushAI {
       const changesDescription = this.formatChangesDescription(categories);
       const diff = execSync('git diff --staged').toString();
 
-      const message = await this.callGroqAPI(changesDescription, diff);
+      const message = await this.callOpenAIAPI(changesDescription, diff);
       return this.validateAndFormatMessage(message);
     } catch (error) {
       console.log('\x1b[33mError generating AI commit message, falling back to basic generation:\x1b[0m', error.message);
@@ -148,16 +186,16 @@ class GitPushAI {
     ].filter(line => !line.endsWith(': ')).join('\n');
   }
 
-  async callGroqAPI(changesDescription, diff) {
-    debug('Calling Groq API with changes:', changesDescription);
-    const response = await fetch('https://api.groq.com/v1/completions', {
+  async callOpenAIAPI(changesDescription, diff) {
+    debug('Calling OpenAI API with changes:', changesDescription);
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: process.env.COMMIT_MESSAGE_MODEL || 'llama2-70b-chat',
+        model: process.env.COMMIT_MESSAGE_MODEL || 'gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
@@ -175,7 +213,7 @@ class GitPushAI {
 
     if (!response.ok) {
       debug('API error:', response.statusText);
-      throw new Error(`Groq API error: ${response.statusText}`);
+      throw new Error(`OpenAI API error: ${response.statusText}`);
     }
 
     const data = await response.json();

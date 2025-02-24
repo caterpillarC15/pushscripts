@@ -69,7 +69,12 @@ push
 Create a `.pushscripts-rc` file in your home directory:
 
 ```bash
+# Required: Your Groq API key
 GROQ_API_KEY=your-api-key
+
+# Optional: Customize settings
+COMMIT_MESSAGE_MODEL=llama-3.3-70b-versatile  # Default model
+COMMIT_MESSAGE_TEMPERATURE=0.3                 # Lower = more focused
 ```
 
 ## Development 🛠️

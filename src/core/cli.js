@@ -4,32 +4,21 @@ const readline = require('readline');
 const GitPushAI = require('./index');
 require('dotenv').config();
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 async function main() {
-  const gitPush = new GitPushAI(GROQ_API_KEY);
+  const gitPush = new GitPushAI(OPENAI_API_KEY);
   const shouldPush = process.argv[1].endsWith('push');
   
   try {
-    // Check for sensitive files first
-    const sensitiveFiles = gitPush.checkSensitiveFiles();
-    if (sensitiveFiles.length > 0) {
-      console.error('\x1b[31mError: Attempting to commit sensitive files:\x1b[0m');
-      sensitiveFiles.forEach(file => console.error(`- ${file}`));
-      console.error('\nPlease remove these files from git:');
-      console.error('1. Add them to .gitignore');
-      console.error('2. Run: git rm --cached <file>');
-      process.exit(1);
-    }
-
-    // Get git status
+    // Get git status for display
     const changes = gitPush.getGitStatus();
     if (changes.length === 0) {
       console.log('\x1b[33mNo changes to commit!\x1b[0m');
       process.exit(0);
     }
 
-    // Generate commit message
+    // Generate commit message for preview
     const commitMessage = await gitPush.generateAICommitMessage(changes);
     
     // Confirm with user
@@ -39,19 +28,24 @@ async function main() {
       process.exit(0);
     }
 
-    // Commit and optionally push
-    const { execSync } = require('child_process');
-    execSync(`git commit -m "${commitMessage}"`, { stdio: 'inherit' });
-    
+    // Perform git operations
     if (shouldPush) {
-      execSync('git push', { stdio: 'inherit' });
+      await gitPush.push();
       console.log('\x1b[32mSuccessfully committed and pushed changes!\x1b[0m');
     } else {
+      await gitPush.commit();
       console.log('\x1b[32mSuccessfully committed changes!\x1b[0m');
       console.log('\x1b[36mTo push these changes, run:\x1b[0m git push');
     }
   } catch (error) {
-    console.error('\x1b[31mError:', error.message, '\x1b[0m');
+    if (error.message === 'Sensitive files detected') {
+      console.error('\x1b[31mError: Attempting to commit sensitive files\x1b[0m');
+      console.error('\nPlease remove these files from git:');
+      console.error('1. Add them to .gitignore');
+      console.error('2. Run: git rm --cached <file>');
+    } else {
+      console.error('\x1b[31mError:', error.message, '\x1b[0m');
+    }
     process.exit(1);
   }
 }
