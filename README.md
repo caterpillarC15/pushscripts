@@ -64,7 +64,7 @@ GROQ_API_KEY=your-api-key
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pushscripts.git
+git clone https://github.com/caterpillarC15/pushscripts.git
 
 # Install dependencies
 cd pushscripts
@@ -73,6 +73,17 @@ pnpm install
 # Run in development mode
 pnpm run dev
 ```
+
+### Branch Structure 🌳
+
+We maintain a single main branch:
+- `main`: Production and development code
+
+Development Workflow:
+1. Create feature branches from `main` for new features
+2. Submit pull requests to merge changes back into `main`
+3. Keep commits clean and conventional using PushScripts
+4. Ensure all tests pass before merging
 
 ## Project Structure 📁
 
@@ -98,7 +109,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support 💬
 
 Need help? We've got you:
-1. Check the [documentation](https://yourusername.github.io/pushscripts)
+1. Check the [documentation](https://caterpillarC15.github.io/pushscripts)
 2. Open an issue
 3. Join our GitHub discussions
 

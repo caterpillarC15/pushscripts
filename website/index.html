@@ -39,7 +39,12 @@
             </div>
         </div>
         <div class="nav-right">
-            <a href="https://github.com/yourusername/pushscripts" class="nav-link">GitHub</a>
+            <a href="https://github.com/caterpillarC15/pushscripts" class="github-link">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/>
+                </svg>
+                GitHub
+            </a>
             <button class="sign-in-button">Sign in</button>
         </div>
     </header>
@@ -60,6 +65,7 @@
                     <h3>Core Concepts</h3>
                     <ul>
                         <li><a href="#configuration">Configuration</a></li>
+                        <li><a href="#examples">Examples</a></li>
                     </ul>
                 </div>
             </nav>
@@ -72,15 +78,8 @@
                 <p class="intro-text">Ship code faster with AI-powered git commands. Stop writing commit messages manually - let AI handle the documentation while you focus on coding.</p>
                 
                 <p class="not-ready">
-                    Want to try it first? <a href="#quick-setup">See how to get started in under 30 seconds</a>.
+                    Ready to start? Choose global installation for personal use or project integration for team workflows.
                 </p>
-
-                <!-- Tab Navigation -->
-                <nav class="tab-nav">
-                    <a href="#most-popular" class="tab-item active">Most popular</a>
-                    <a href="#quick-setup" class="tab-item">Quick setup</a>
-                    <a href="#advanced" class="tab-item">Advanced</a>
-                </nav>
 
                 <!-- Feature Cards -->
                 <div class="feature-cards">
@@ -89,8 +88,14 @@
                         <p>Use AI-powered commits in any git repository.</p>
                         <span class="tag">RECOMMENDED</span>
                         <div class="code-block">
-                            <pre><code class="language-bash">pnpm add -g pushscripts</code></pre>
-                            <button class="copy-button" onclick="copyInstallCommand()">Copy</button>
+                            <pre><code class="language-bash"># Install globally
+pnpm add -g pushscripts
+
+# Use 'push' to commit and push
+push
+
+# Or 'commit' to only commit</code></pre>
+                            <button class="copy-button" data-copy="global">Copy</button>
                         </div>
                     </div>
 
@@ -107,13 +112,15 @@ cp .env.example .env
 # Add to package.json scripts
 {
   "scripts": {
-    "push": "node src/core/cli.js"
+    "push": "node src/core/cli.js",
+    "commit": "node src/core/cli.js"
   }
 }
 
 # Use locally with pnpm
-pnpm push</code></pre>
-                            <button class="copy-button" onclick="copyProjectCommand()">Copy</button>
+pnpm push    # commit and push
+pnpm commit  # commit only</code></pre>
+                            <button class="copy-button" data-copy="project">Copy</button>
                         </div>
                     </div>
                 </div>
@@ -152,7 +159,7 @@ echo "GROQ_API_KEY=your-api-key" > ~/.pushscripts-rc
 # Use in any git repository
 git add .
 push</code></pre>
-                        <button class="copy-button" onclick="copyInstallCommand()">Copy</button>
+                        <button class="copy-button" data-copy="quickstart">Copy</button>
                     </div>
                 </div>
 
@@ -166,7 +173,7 @@ push</code></pre>
 
 feat(auth): implement OAuth2 login flow with Google provider
 
-? Proceed with commit and push? (y/N)</code></pre>
+? Proceed with commit and push? (Y/n)</code></pre>
                     </div>
                 </div>
 
@@ -197,7 +204,7 @@ feat(auth): implement OAuth2 login flow with Google provider
                         <pre><code class="language-bash"># Required: Your Groq API key for AI commit message generation
 GROQ_API_KEY=your-api-key-here
 
-# Optional: Default git branch for push (defaults to 'main' if not set)
+# Optional: Default git branch (defaults to 'main')
 GIT_DEFAULT_BRANCH=main
 
 # Optional: Customize commit message settings
@@ -206,7 +213,7 @@ COMMIT_MESSAGE_MODEL=llama2-70b-chat
 
 # Optional: Enable debug mode for detailed logging
 DEBUG=pushscripts:*</code></pre>
-                        <button class="copy-button" onclick="copyEnvCommand()">Copy</button>
+                        <button class="copy-button" data-copy="env">Copy</button>
                     </div>
                 </div>
 
@@ -219,6 +226,47 @@ DEBUG=pushscripts:*</code></pre>
                         Security Best Practices
                     </div>
                     <p>Never commit your API key. For global installation, use <code>~/.pushscripts-rc</code>. For projects, use <code>.env</code> and ensure it's in <code>.gitignore</code>. For CI/CD, use secure environment variables.</p>
+                </div>
+
+                <!-- Info Box -->
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <svg class="info-box-icon" width="16" height="16" viewBox="0 0 16 16">
+                            <path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zm1-3V7H7v6h2zM8 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
+                        Debug Mode
+                    </div>
+                    <p>Enable debug mode by setting <code>DEBUG=pushscripts:*</code> to see detailed logs about git operations, API calls, and commit message generation.</p>
+                </div>
+
+                <!-- Debug Output Example -->
+                <div class="code-example">
+                    <div class="code-example-header">
+                        <div class="code-example-tabs">
+                            <div class="code-example-tab active">Debug Output</div>
+                        </div>
+                    </div>
+                    <div class="code-example-content">
+                        <pre><code class="language-bash"># Initialize with configuration
+pushscripts:* PushScripts initialized with config: {
+  defaultBranch: 'main',
+  model: 'llama2-70b-chat',
+  temperature: 0.3
+} +0ms
+
+# Git status check
+pushscripts:* Getting git status +2ms
+pushscripts:* Found changes: [
+  { status: 'M', file: 'src/core/index.js' },
+  { status: 'A', file: 'docs/README.md' }
+] +1ms
+
+# API call and response
+pushscripts:* Calling Groq API with changes: Modified files: src/core/index.js
+Added files: docs/README.md +3ms
+pushscripts:* Generated commit message: feat(docs): add README documentation +2s</code></pre>
+                        <button class="copy-button" data-copy="debug">Copy</button>
+                    </div>
                 </div>
 
                 <!-- Node.js Usage -->
@@ -264,7 +312,7 @@ async function handleGitCommit() {
     console.error('Error:', error.message);
   }
 }</code></pre>
-                        <button class="copy-button" onclick="copyConfigCommand()">Copy</button>
+                        <button class="copy-button" data-copy="nodejs">Copy</button>
                     </div>
                 </div>
 
@@ -298,19 +346,144 @@ env:
 2. Copy .env.example to .env
 3. Add your GROQ_API_KEY
 4. Use 'pnpm push' instead of 'git push'</code></pre>
-                        <button class="copy-button" onclick="copyTeamCommand()">Copy</button>
+                        <button class="copy-button" data-copy="team">Copy</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Examples Section -->
+            <section id="examples" class="doc-section">
+                <h2>Examples</h2>
+                <p>Real-world examples of using PushScripts in different scenarios.</p>
+
+                <!-- Basic Usage -->
+                <div class="code-example" data-example="basic">
+                    <div class="code-example-header">
+                        <div class="code-example-tabs">
+                            <div class="code-example-tab active">Basic Usage</div>
+                        </div>
+                    </div>
+                    <div class="code-example-content">
+                        <pre><code class="language-bash"># Stage your changes
+git add .
+
+# Option 1: Generate commit message, commit, and push in one step
+push
+
+# Output:
+Changes: 2 files (1 modified, 1 added, 0 deleted)
+
+Proposed Commit Message:
+feat(api): add user authentication endpoints
+
+Git Status:
+On branch main
+Changes to be committed:
+  modified: src/api/auth.js
+  added: src/api/middleware.js
+
+Proceed with commit and push? (Y/n)
+
+✓ Successfully committed and pushed changes!
+
+# Option 2: Generate commit message and commit only
+commit
+
+# Output:
+Changes: 2 files (1 modified, 1 added, 0 deleted)
+
+Proposed Commit Message:
+feat(api): add user authentication endpoints
+
+Git Status:
+On branch main
+Changes to be committed:
+  modified: src/api/auth.js
+  added: src/api/middleware.js
+
+Proceed with commit? (Y/n)
+
+✓ Successfully committed changes!
+To push these changes, run: git push</code></pre>
+                        <button class="copy-button" data-copy="basic">Copy</button>
                     </div>
                 </div>
 
-                <!-- Debugging -->
-                <div class="info-box">
-                    <div class="info-box-title">
-                        <svg class="info-box-icon" width="16" height="16" viewBox="0 0 16 16">
-                            <path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zm1-3V7H7v6h2zM8 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-                        </svg>
-                        Debugging
+                <!-- Multiple Changes -->
+                <div class="code-example" data-example="multiple">
+                    <div class="code-example-header">
+                        <div class="code-example-tabs">
+                            <div class="code-example-tab active">Multiple Changes</div>
+                        </div>
                     </div>
-                    <p>Enable debug mode by setting <code>DEBUG=pushscripts:*</code> in your environment. This will show detailed logs about git operations, API calls, and commit message generation.</p>
+                    <div class="code-example-content">
+                        <pre><code class="language-bash"># With debug mode enabled
+DEBUG=pushscripts:* push
+
+# Output:
+pushscripts:* PushScripts initialized with config: {
+  defaultBranch: 'main',
+  model: 'llama2-70b-chat',
+  temperature: 0.3
+}
+pushscripts:* Getting git status
+pushscripts:* Found changes: [
+  { status: 'M', file: 'src/core/index.js' },
+  { status: 'A', file: 'src/core/auth.js' }
+]
+
+Proposed Commit Message:
+feat(core): implement authentication module
+
+Git Status:
+On branch main
+Changes to be committed:
+  modified: src/core/index.js
+  added: src/core/auth.js
+
+Proceed with commit and push? (Y/n)
+
+✓ Successfully committed and pushed changes!</code></pre>
+                        <button class="copy-button" data-copy="multiple">Copy</button>
+                    </div>
+                </div>
+
+                <!-- Error Handling -->
+                <div class="code-example" data-example="error">
+                    <div class="code-example-header">
+                        <div class="code-example-tabs">
+                            <div class="code-example-tab active">Error Handling</div>
+                        </div>
+                    </div>
+                    <div class="code-example-content">
+                        <pre><code class="language-bash"># Attempting to commit sensitive files
+push
+
+# Output:
+Error: Attempting to commit sensitive files:
+- .env
+- credentials.json
+
+Please remove these files from git:
+1. Add them to .gitignore
+2. Run: git rm --cached <file>
+
+# API error fallback example
+Changes: 1 file (1 modified, 0 added, 0 deleted)
+
+Error generating AI commit message, falling back to standard generation:
+Groq API error: Unauthorized
+
+Git Status:
+On branch main
+Changes to be committed:
+  modified: src/core/index.js
+
+Proceed with commit and push? (Y/n)
+
+✓ Successfully committed and pushed changes!</code></pre>
+                        <button class="copy-button" data-copy="error">Copy</button>
+                    </div>
                 </div>
             </section>
         </main>
@@ -320,6 +493,89 @@ env:
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-bash.min.js"></script>
     <script>
+        // Search functionality
+        function initSearch() {
+            const searchInput = document.querySelector('.search-container input');
+            const searchResults = document.createElement('div');
+            searchResults.className = 'search-results';
+            document.querySelector('.search-container').appendChild(searchResults);
+            
+            let debounceTimeout;
+            
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    const query = e.target.value.toLowerCase();
+                    if (query.length < 2) {
+                        searchResults.style.display = 'none';
+                        return;
+                    }
+
+                    // Get all searchable content
+                    const sections = document.querySelectorAll('.doc-section, .documentation-intro');
+                    const results = [];
+
+                    sections.forEach(section => {
+                        const title = section.querySelector('h1, h2')?.textContent || '';
+                        const content = section.textContent;
+                        
+                        if (title.toLowerCase().includes(query) || content.toLowerCase().includes(query)) {
+                            const id = section.id || section.querySelector('h2')?.id;
+                            results.push({
+                                title: title,
+                                preview: getPreview(content, query),
+                                link: id ? `#${id}` : '#'
+                            });
+                        }
+                    });
+
+                    // Show results
+                    if (results.length > 0) {
+                        searchResults.innerHTML = results.map(result => `
+                            <a href="${result.link}" class="search-result">
+                                <h4>${result.title}</h4>
+                                <p>${result.preview}</p>
+                            </a>
+                        `).join('');
+                        searchResults.style.display = 'block';
+                    } else {
+                        searchResults.innerHTML = '<div class="no-results">No results found</div>';
+                        searchResults.style.display = 'block';
+                    }
+                }, 300);
+            });
+
+            // Close search results when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-container')) {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            // Handle keyboard navigation
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    searchResults.style.display = 'none';
+                    searchInput.blur();
+                }
+            });
+        }
+
+        function getPreview(content, query) {
+            const words = content.split(/\s+/);
+            const queryIndex = words.findIndex(word => 
+                word.toLowerCase().includes(query)
+            );
+            
+            if (queryIndex === -1) return '';
+            
+            const start = Math.max(0, queryIndex - 5);
+            const end = Math.min(words.length, queryIndex + 5);
+            const preview = words.slice(start, end).join(' ');
+            
+            return start > 0 ? `...${preview}...` : `${preview}...`;
+        }
+
         // Copy functionality
         function copyToClipboard(text, button) {
             navigator.clipboard.writeText(text);
@@ -330,23 +586,84 @@ env:
             }, 2000);
         }
 
+        function copyQuickstartCommand() {
+            const codeBlock = document.querySelector('[data-copy="quickstart"]').closest('.code-example-content').querySelector('code');
+            const button = document.querySelector('[data-copy="quickstart"]');
+            if (codeBlock && button) {
+                copyToClipboard(codeBlock.textContent, button);
+            }
+        }
+
         function copyInstallCommand() {
-            copyToClipboard('pnpm add -g pushscripts', document.querySelector('.copy-button'));
+            const codeBlock = document.querySelector('[data-copy="global"]').closest('.code-block').querySelector('code');
+            const button = document.querySelector('[data-copy="global"]');
+            if (codeBlock && button) {
+                copyToClipboard(codeBlock.textContent, button);
+            }
+        }
+
+        function copyProjectCommand() {
+            const codeBlock = document.querySelector('[data-copy="project"]').closest('.code-block').querySelector('code');
+            const button = document.querySelector('[data-copy="project"]');
+            if (codeBlock && button) {
+                copyToClipboard(codeBlock.textContent, button);
+            }
         }
 
         function copyConfigCommand() {
-            const config = document.querySelector('#configuration .code-example-content code').textContent;
-            copyToClipboard(config, document.querySelector('#configuration .copy-button'));
+            const codeBlock = document.querySelector('[data-copy="nodejs"]').closest('.code-example-content').querySelector('code');
+            const button = document.querySelector('[data-copy="nodejs"]');
+            if (codeBlock && button) {
+                copyToClipboard(codeBlock.textContent, button);
+            }
         }
 
         function copyEnvCommand() {
-            const env = document.querySelector('#configuration .code-example-content code').textContent;
-            copyToClipboard(env, document.querySelector('#configuration .copy-button'));
+            const codeBlock = document.querySelector('[data-copy="env"]').closest('.code-example-content').querySelector('code');
+            const button = document.querySelector('[data-copy="env"]');
+            if (codeBlock && button) {
+                copyToClipboard(codeBlock.textContent, button);
+            }
         }
 
         function copyTeamCommand() {
-            const team = document.querySelector('#configuration .code-example-content code').textContent;
-            copyToClipboard(team, document.querySelector('#configuration .copy-button'));
+            const codeBlock = document.querySelector('[data-copy="team"]').closest('.code-example-content').querySelector('code');
+            const button = document.querySelector('[data-copy="team"]');
+            if (codeBlock && button) {
+                copyToClipboard(codeBlock.textContent, button);
+            }
+        }
+
+        function copyDebugCommand() {
+            const codeBlock = document.querySelector('[data-copy="debug"]').closest('.code-example-content').querySelector('code');
+            const button = document.querySelector('[data-copy="debug"]');
+            if (codeBlock && button) {
+                copyToClipboard(codeBlock.textContent, button);
+            }
+        }
+
+        function copyBasicExample() {
+            const codeBlock = document.querySelector('[data-example="basic"] code');
+            const button = document.querySelector('[data-copy="basic"]');
+            if (codeBlock && button) {
+                copyToClipboard(codeBlock.textContent, button);
+            }
+        }
+
+        function copyMultipleExample() {
+            const codeBlock = document.querySelector('[data-example="multiple"] code');
+            const button = document.querySelector('[data-copy="multiple"]');
+            if (codeBlock && button) {
+                copyToClipboard(codeBlock.textContent, button);
+            }
+        }
+
+        function copyErrorExample() {
+            const codeBlock = document.querySelector('[data-example="error"] code');
+            const button = document.querySelector('[data-copy="error"]');
+            if (codeBlock && button) {
+                copyToClipboard(codeBlock.textContent, button);
+            }
         }
 
         // Mobile menu toggle
@@ -369,6 +686,49 @@ env:
                 e.preventDefault();
                 document.querySelector('.search-container input').focus();
             }
+        });
+
+        // Initialize search when the page loads
+        document.addEventListener('DOMContentLoaded', initSearch);
+
+        // Initialize all copy buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            const copyButtons = document.querySelectorAll('.copy-button[data-copy]');
+            copyButtons.forEach(button => {
+                const type = button.getAttribute('data-copy');
+                switch (type) {
+                    case 'global':
+                        button.onclick = copyInstallCommand;
+                        break;
+                    case 'project':
+                        button.onclick = copyProjectCommand;
+                        break;
+                    case 'quickstart':
+                        button.onclick = copyQuickstartCommand;
+                        break;
+                    case 'nodejs':
+                        button.onclick = copyConfigCommand;
+                        break;
+                    case 'env':
+                        button.onclick = copyEnvCommand;
+                        break;
+                    case 'team':
+                        button.onclick = copyTeamCommand;
+                        break;
+                    case 'debug':
+                        button.onclick = copyDebugCommand;
+                        break;
+                    case 'basic':
+                        button.onclick = copyBasicExample;
+                        break;
+                    case 'multiple':
+                        button.onclick = copyMultipleExample;
+                        break;
+                    case 'error':
+                        button.onclick = copyErrorExample;
+                        break;
+                }
+            });
         });
     </script>
 </body>

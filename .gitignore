@@ -36,6 +36,10 @@ pnpm-debug.log*
 coverage/
 .nyc_output/
 
+# Development only
+branding/
+devdocs.md
+
 # Misc
 *.pem
 .cache/

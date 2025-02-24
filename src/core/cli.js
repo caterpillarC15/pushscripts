@@ -8,6 +8,7 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 async function main() {
   const gitPush = new GitPushAI(GROQ_API_KEY);
+  const shouldPush = process.argv[1].endsWith('push');
   
   try {
     // Check for sensitive files first
@@ -32,25 +33,30 @@ async function main() {
     const commitMessage = await gitPush.generateAICommitMessage(changes);
     
     // Confirm with user
-    const shouldProceed = await confirmWithUser(commitMessage);
+    const shouldProceed = await confirmWithUser(commitMessage, shouldPush);
     if (!shouldProceed) {
-      console.log('\x1b[33mPush cancelled by user\x1b[0m');
+      console.log('\x1b[33mOperation cancelled by user\x1b[0m');
       process.exit(0);
     }
 
-    // Commit and push
+    // Commit and optionally push
     const { execSync } = require('child_process');
     execSync(`git commit -m "${commitMessage}"`, { stdio: 'inherit' });
-    execSync('git push', { stdio: 'inherit' });
     
-    console.log('\x1b[32mSuccessfully committed and pushed changes!\x1b[0m');
+    if (shouldPush) {
+      execSync('git push', { stdio: 'inherit' });
+      console.log('\x1b[32mSuccessfully committed and pushed changes!\x1b[0m');
+    } else {
+      console.log('\x1b[32mSuccessfully committed changes!\x1b[0m');
+      console.log('\x1b[36mTo push these changes, run:\x1b[0m git push');
+    }
   } catch (error) {
     console.error('\x1b[31mError:', error.message, '\x1b[0m');
     process.exit(1);
   }
 }
 
-async function confirmWithUser(commitMessage) {
+async function confirmWithUser(commitMessage, shouldPush) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -62,9 +68,10 @@ async function confirmWithUser(commitMessage) {
     console.log('\nGit Status:');
     require('child_process').execSync('git status', { stdio: 'inherit' });
     
-    rl.question('\n\x1b[36mProceed with commit and push? (y/N): \x1b[0m', answer => {
+    const action = shouldPush ? 'commit and push' : 'commit';
+    rl.question(`\n\x1b[36mProceed with ${action}? (Y/n): \x1b[0m`, answer => {
       rl.close();
-      resolve(answer.toLowerCase() === 'y');
+      resolve(answer.toLowerCase() !== 'n');
     });
   });
 }
