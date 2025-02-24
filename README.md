@@ -64,7 +64,7 @@ GROQ_API_KEY=your-api-key
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pushscripts.git
+git clone https://github.com/caterpillarC15/pushscripts.git
 
 # Install dependencies
 cd pushscripts
@@ -73,6 +73,18 @@ pnpm install
 # Run in development mode
 pnpm run dev
 ```
+
+### Branch Structure 🌳
+
+We maintain two main branches:
+- `main`: Production-ready code
+- `develop`: Development and feature integration
+
+Development Workflow:
+1. All new features should be developed on `develop` branch
+2. Create feature branches from `develop` for specific features
+3. Development-only files (branding/, devdocs.md) should stay in `develop`
+4. When ready for release, merge `develop` into `main`
 
 ## Project Structure 📁
 
