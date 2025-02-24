@@ -42,10 +42,32 @@ push  # or 'commit' if you don't want to push
 
 3. **Enable AI features (recommended):**
 ```bash
-# Choose your preferred AI provider in your environment
-PUSHSCRIPTS_MODEL_PROVIDER=your_provider
-# Add your API key
-YOUR_PROVIDER_API_KEY=your-key-here
+# Example 1: Using OpenAI
+PUSHSCRIPTS_MODEL_PROVIDER=openai
+OPENAI_API_KEY=sk-your-key-here
+# Optional: Choose a specific model
+PUSHSCRIPTS_MODEL=gpt-4-turbo-preview
+
+# Example 2: Using Anthropic
+PUSHSCRIPTS_MODEL_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+# Optional: Choose a specific model
+PUSHSCRIPTS_MODEL=claude-3-opus-20240229
+
+# Example 3: Using Groq
+PUSHSCRIPTS_MODEL_PROVIDER=groq
+GROQ_API_KEY=gsk-your-key-here
+# Optional: Choose a specific model
+PUSHSCRIPTS_MODEL=mixtral-8x7b-chat
+
+# Example 4: Using Azure OpenAI
+PUSHSCRIPTS_MODEL_PROVIDER=azure
+AZURE_OPENAI_API_KEY=your-key-here
+AZURE_OPENAI_ENDPOINT=your-endpoint
+# Optional: Choose a specific model
+PUSHSCRIPTS_MODEL=gpt-4
+
+# Choose any of the above configurations and add to your environment
 ```
 
 4. **Enjoy smart commits:**
