@@ -19,11 +19,17 @@ PushScripts supercharges your git workflow with AI. Stop writing commit messages
 # Install globally via pnpm (recommended)
 pnpm add -g pushscripts
 
-# Set up your API key (choose one)
+# Create a .env file in your project (recommended)
+cp .env.example .env
+# Edit .env with your API key
+
+# Or set up globally (alternative)
 echo "OPENAI_API_KEY=your-api-key" > ~/.pushscripts-rc
-# or
+# or for Groq
 echo "GROQ_API_KEY=your-api-key" > ~/.pushscripts-rc
 ```
+
+The `.env` file takes precedence over the global configuration. This allows you to use different settings per project.
 
 ## Usage 🚀
 
@@ -78,14 +84,17 @@ OPENAI_API_KEY=your-api-key
 GROQ_API_KEY=your-api-key
 
 # Optional: Choose your LLM provider
-LLM_PROVIDER=openai  # or 'groq'
+PUSHSCRIPTS_MODEL_PROVIDER=openai  # or 'groq'
 
 # Optional: Customize model and settings
-COMMIT_MESSAGE_MODEL=gpt-3.5-turbo  # OpenAI model
+PUSHSCRIPTS_MODEL=gpt-4-turbo-preview  # OpenAI model (default)
 # or
-COMMIT_MESSAGE_MODEL=llama2-70b-chat  # Groq model
+PUSHSCRIPTS_MODEL=mixtral-8x7b-chat  # Groq model (default)
 
-COMMIT_MESSAGE_TEMPERATURE=0.3  # Lower = more focused
+PUSHSCRIPTS_TEMPERATURE=0.3  # Lower = more focused
+
+# Optional: Enable debug mode
+DEBUG=pushscripts:*
 ```
 
 ### Supported LLM Providers 🤖
@@ -93,12 +102,12 @@ COMMIT_MESSAGE_TEMPERATURE=0.3  # Lower = more focused
 PushScripts supports multiple LLM providers for generating commit messages:
 
 1. **OpenAI** (default)
-   - Models: gpt-3.5-turbo, gpt-4, etc.
-   - Set `LLM_PROVIDER=openai` and `OPENAI_API_KEY`
+   - Models: gpt-4-turbo-preview (default), gpt-4, gpt-3.5-turbo
+   - Set `PUSHSCRIPTS_MODEL_PROVIDER=openai` and `OPENAI_API_KEY`
 
 2. **Groq**
-   - Models: llama2-70b-chat, mixtral-8x7b-chat, etc.
-   - Set `LLM_PROVIDER=groq` and `GROQ_API_KEY`
+   - Models: mixtral-8x7b-chat (default), llama2-70b-chat
+   - Set `PUSHSCRIPTS_MODEL_PROVIDER=groq` and `GROQ_API_KEY`
 
 Choose the provider and model that best fits your needs and budget.
 
@@ -111,6 +120,10 @@ git clone https://github.com/caterpillarC15/pushscripts.git
 # Install dependencies
 cd pushscripts
 pnpm install
+
+# Create your .env file
+cp .env.example .env
+# Edit .env with your API key
 
 # Run in development mode
 pnpm run dev
@@ -151,14 +164,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support 💬
 
 Need help? We've got you:
-1. Check the [documentation](https://caterpillarC15.github.io/pushscripts)
+1. Check the [documentation](https://github.com/caterpillarC15/pushscripts)
 2. Open an issue
 3. Join our GitHub discussions
 
 ## Acknowledgments 🙏
 
-- [Groq](https://groq.com) for their powerful LLM API
+- [OpenAI](https://openai.com) and [Groq](https://groq.com) for their powerful LLM APIs
 - The open-source community for inspiration and support
 
 ---
-Made with ❤️ by [Your Name] 
+Made with ❤️ by the PushScripts Team
