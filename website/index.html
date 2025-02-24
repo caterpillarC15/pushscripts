@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PushScripts - Ship Code Faster with AI-Powered Git Commands</title>
+    <meta name="description" content="Stop writing commit messages manually. Let AI analyze your changes and craft perfect commits while you focus on coding.">
+    <meta name="keywords" content="git, automation, AI, commit messages, developer tools, productivity">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID" crossorigin="anonymous"></script>
+    
+    <!-- Prism.js for code highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet" />
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="top-nav">
+        <div class="nav-left">
+            <a href="/" class="logo">
+                <img src="assets/images/logo.svg" alt="PushScripts Logo" />
+                <span class="logo-docs">DOCS</span>
+            </a>
+        </div>
+        <div class="nav-center">
+            <div class="search-container">
+                <input type="text" placeholder="Search the docs or ask a question" />
+                <kbd>/</kbd>
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="https://github.com/yourusername/pushscripts" class="nav-link">GitHub</a>
+            <button class="sign-in-button">Sign in</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="nav-group">
+                    <h3>Getting Started</h3>
+                    <ul>
+                        <li><a href="#introduction" class="active">Introduction</a></li>
+                        <li><a href="#quickstart">Quickstart</a></li>
+                    </ul>
+                </div>
+                <div class="nav-group">
+                    <h3>Core Concepts</h3>
+                    <ul>
+                        <li><a href="#configuration">Configuration</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <div class="documentation-intro">
+                <h1>PushScripts</h1>
+                <p class="intro-text">Ship code faster with AI-powered git commands. Stop writing commit messages manually - let AI handle the documentation while you focus on coding.</p>
+                
+                <p class="not-ready">
+                    Want to try it first? <a href="#quick-setup">See how to get started in under 30 seconds</a>.
+                </p>
+
+                <!-- Tab Navigation -->
+                <nav class="tab-nav">
+                    <a href="#most-popular" class="tab-item active">Most popular</a>
+                    <a href="#quick-setup" class="tab-item">Quick setup</a>
+                    <a href="#advanced" class="tab-item">Advanced</a>
+                </nav>
+
+                <!-- Feature Cards -->
+                <div class="feature-cards">
+                    <div class="feature-card">
+                        <h3>Global Installation</h3>
+                        <p>Use AI-powered commits in any git repository.</p>
+                        <span class="tag">RECOMMENDED</span>
+                        <div class="code-block">
+                            <pre><code class="language-bash">pnpm add -g pushscripts</code></pre>
+                            <button class="copy-button" onclick="copyInstallCommand()">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>Project Integration</h3>
+                        <p>Set up smart commits for your team's workflow.</p>
+                        <div class="code-block">
+                            <pre><code class="language-bash"># Install as dev dependency
+pnpm add -D pushscripts
+
+# Copy environment file
+cp .env.example .env
+
+# Add to package.json scripts
+{
+  "scripts": {
+    "push": "node src/core/cli.js"
+  }
+}
+
+# Use locally with pnpm
+pnpm push</code></pre>
+                            <button class="copy-button" onclick="copyProjectCommand()">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentation Sections -->
+            <section id="quickstart" class="doc-section">
+                <h2>Quickstart</h2>
+                <p>Get started with AI-powered commit messages in minutes.</p>
+
+                <!-- Info Box -->
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <svg class="info-box-icon" width="16" height="16" viewBox="0 0 16 16">
+                            <path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zm1-3V7H7v6h2zM8 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
+                        Before you begin
+                    </div>
+                    <p>Make sure you have your Groq API key ready (any model should work). You can get one from the <a href="https://console.groq.com">Groq Console</a>.</p>
+                </div>
+                
+                <!-- Code Example with Tabs -->
+                <div class="code-example">
+                    <div class="code-example-header">
+                        <div class="version-selector">
+                            <button class="version-button">v1.0.0</button>
+                        </div>
+                    </div>
+                    <div class="code-example-content">
+                        <pre><code class="language-bash"># Install globally
+pnpm add -g pushscripts
+
+# Set up your API key
+echo "GROQ_API_KEY=your-api-key" > ~/.pushscripts-rc
+
+# Use in any git repository
+git add .
+push</code></pre>
+                        <button class="copy-button" onclick="copyInstallCommand()">Copy</button>
+                    </div>
+                </div>
+
+                <!-- Response Preview -->
+                <div class="response-preview">
+                    <div class="response-preview-header">Example output</div>
+                    <div class="response-preview-content">
+                        <pre><code class="language-bash"># AI generates commit message
+✓ Analyzing changes...
+✓ Generating commit message...
+
+feat(auth): implement OAuth2 login flow with Google provider
+
+? Proceed with commit and push? (y/N)</code></pre>
+                    </div>
+                </div>
+
+                <!-- Steps Navigation -->
+                <nav class="steps-nav">
+                    <a href="#introduction" class="step-link prev">
+                        ← Introduction
+                    </a>
+                    <a href="#configuration" class="step-link next">
+                        Configuration →
+                    </a>
+                </nav>
+            </section>
+
+            <!-- Configuration Section -->
+            <section id="configuration" class="doc-section">
+                <h2>Configuration</h2>
+                <p>Customize PushScripts to match your team's workflow and handle different environments securely.</p>
+
+                <!-- Environment Setup -->
+                <div class="code-example">
+                    <div class="code-example-header">
+                        <div class="code-example-tabs">
+                            <div class="code-example-tab active">Environment</div>
+                        </div>
+                    </div>
+                    <div class="code-example-content">
+                        <pre><code class="language-bash"># Required: Your Groq API key for AI commit message generation
+GROQ_API_KEY=your-api-key-here
+
+# Optional: Default git branch for push (defaults to 'main' if not set)
+GIT_DEFAULT_BRANCH=main
+
+# Optional: Customize commit message settings
+COMMIT_MESSAGE_TEMPERATURE=0.3
+COMMIT_MESSAGE_MODEL=llama2-70b-chat
+
+# Optional: Enable debug mode for detailed logging
+DEBUG=pushscripts:*</code></pre>
+                        <button class="copy-button" onclick="copyEnvCommand()">Copy</button>
+                    </div>
+                </div>
+
+                <!-- Info Box -->
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <svg class="info-box-icon" width="16" height="16" viewBox="0 0 16 16">
+                            <path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zm1-3V7H7v6h2zM8 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
+                        Security Best Practices
+                    </div>
+                    <p>Never commit your API key. For global installation, use <code>~/.pushscripts-rc</code>. For projects, use <code>.env</code> and ensure it's in <code>.gitignore</code>. For CI/CD, use secure environment variables.</p>
+                </div>
+
+                <!-- Node.js Usage -->
+                <div class="code-example">
+                    <div class="code-example-header">
+                        <div class="code-example-tabs">
+                            <div class="code-example-tab active">Node.js</div>
+                        </div>
+                    </div>
+                    <div class="code-example-content">
+                        <pre><code class="language-javascript">// Using in your own Node.js script
+const GitPushAI = require('pushscripts');
+
+async function handleGitCommit() {
+  try {
+    // Initialize with API key
+    const gitPush = new GitPushAI(process.env.GROQ_API_KEY);
+
+    // Check for sensitive files first
+    const sensitiveFiles = gitPush.checkSensitiveFiles();
+    if (sensitiveFiles.length > 0) {
+      console.error('Found sensitive files:', sensitiveFiles);
+      return;
+    }
+
+    // Get git status
+    const changes = gitPush.getGitStatus();
+    if (changes.length === 0) {
+      console.log('No changes to commit');
+      return;
+    }
+
+    // Generate commit message with error handling
+    try {
+      const message = await gitPush.generateAICommitMessage(changes);
+      console.log('Generated message:', message);
+    } catch (apiError) {
+      console.error('AI generation failed, using basic message');
+      const basicMessage = gitPush.generateBasicCommitMessage(changes);
+      console.log('Basic message:', basicMessage);
+    }
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+}</code></pre>
+                        <button class="copy-button" onclick="copyConfigCommand()">Copy</button>
+                    </div>
+                </div>
+
+                <!-- Team Setup -->
+                <div class="code-example">
+                    <div class="code-example-header">
+                        <div class="code-example-tabs">
+                            <div class="code-example-tab active">Team Setup</div>
+                        </div>
+                    </div>
+                    <div class="code-example-content">
+                        <pre><code class="language-bash"># 1. Add to package.json scripts
+{
+  "scripts": {
+    "push": "node src/core/cli.js",
+    "postinstall": "cp .env.example .env"
+  }
+}
+
+# 2. Add to .gitignore
+.env
+.pushscripts-rc
+
+# 3. Set up in CI/CD (GitHub Actions)
+env:
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
+# 4. Document in README
+## Team Setup
+1. Install dependencies: pnpm install
+2. Copy .env.example to .env
+3. Add your GROQ_API_KEY
+4. Use 'pnpm push' instead of 'git push'</code></pre>
+                        <button class="copy-button" onclick="copyTeamCommand()">Copy</button>
+                    </div>
+                </div>
+
+                <!-- Debugging -->
+                <div class="info-box">
+                    <div class="info-box-title">
+                        <svg class="info-box-icon" width="16" height="16" viewBox="0 0 16 16">
+                            <path fill="currentColor" d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16zm1-3V7H7v6h2zM8 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
+                        Debugging
+                    </div>
+                    <p>Enable debug mode by setting <code>DEBUG=pushscripts:*</code> in your environment. This will show detailed logs about git operations, API calls, and commit message generation.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-bash.min.js"></script>
+    <script>
+        // Copy functionality
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text);
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 2000);
+        }
+
+        function copyInstallCommand() {
+            copyToClipboard('pnpm add -g pushscripts', document.querySelector('.copy-button'));
+        }
+
+        function copyConfigCommand() {
+            const config = document.querySelector('#configuration .code-example-content code').textContent;
+            copyToClipboard(config, document.querySelector('#configuration .copy-button'));
+        }
+
+        function copyEnvCommand() {
+            const env = document.querySelector('#configuration .code-example-content code').textContent;
+            copyToClipboard(env, document.querySelector('#configuration .copy-button'));
+        }
+
+        function copyTeamCommand() {
+            const team = document.querySelector('#configuration .code-example-content code').textContent;
+            copyToClipboard(team, document.querySelector('#configuration .copy-button'));
+        }
+
+        // Mobile menu toggle
+        const menuButton = document.createElement('button');
+        menuButton.className = 'mobile-menu-button';
+        menuButton.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+            </svg>
+        `;
+        document.querySelector('.nav-right').prepend(menuButton);
+
+        menuButton.addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // Search shortcut
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                document.querySelector('.search-container input').focus();
+            }
+        });
+    </script>
+</body>
+</html> 

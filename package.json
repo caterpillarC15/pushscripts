@@ -1,0 +1,45 @@
+{
+  "name": "pushscripts",
+  "version": "1.0.0",
+  "description": "Ship code faster with AI-powered git commands. Smart commit messages that understand your code.",
+  "main": "src/core/index.js",
+  "bin": {
+    "push": "./src/core/cli.js"
+  },
+  "scripts": {
+    "start": "node src/core/cli.js",
+    "dev": "nodemon src/core/cli.js",
+    "serve-docs": "npx serve website",
+    "test": "jest",
+    "firebase:login": "firebase login",
+    "firebase:init": "firebase init",
+    "firebase:serve": "firebase serve",
+    "firebase:deploy": "firebase deploy",
+    "build": "pnpm install && cp -r website/* public/",
+    "push": "node src/core/cli.js"
+  },
+  "keywords": [
+    "git",
+    "automation",
+    "ai",
+    "commit-messages",
+    "developer-tools"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "nodemon": "^2.0.20",
+    "serve": "^14.0.0",
+    "firebase-tools": "^13.0.0"
+  },
+  "packageManager": "pnpm@8.15.4",
+  "engines": {
+    "node": ">=16",
+    "pnpm": ">=8"
+  }
+} 
