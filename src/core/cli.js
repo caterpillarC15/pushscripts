@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 
 const readline = require('readline');
-const GitPushAI = require('./index');
+const PushScriptsModel = require('./index');
 require('dotenv').config();
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 async function main() {
-  const gitPush = new GitPushAI(OPENAI_API_KEY);
+  const pushScripts = new PushScriptsModel(OPENAI_API_KEY);
   const shouldPush = process.argv[1].endsWith('push');
   
   try {
     // Get git status for display
-    const changes = gitPush.getGitStatus();
+    const changes = pushScripts.getGitStatus();
     if (changes.length === 0) {
       console.log('\x1b[33mNo changes to commit!\x1b[0m');
       process.exit(0);
     }
 
     // Generate commit message for preview
-    const commitMessage = await gitPush.generateAICommitMessage(changes);
+    const commitMessage = await pushScripts.generateAICommitMessage(changes);
     
     // Confirm with user
     const shouldProceed = await confirmWithUser(commitMessage, shouldPush);
@@ -30,10 +30,10 @@ async function main() {
 
     // Perform git operations
     if (shouldPush) {
-      await gitPush.push();
+      await pushScripts.push();
       console.log('\x1b[32mSuccessfully committed and pushed changes!\x1b[0m');
     } else {
-      await gitPush.commit();
+      await pushScripts.commit();
       console.log('\x1b[32mSuccessfully committed changes!\x1b[0m');
       console.log('\x1b[36mTo push these changes, run:\x1b[0m git push');
     }

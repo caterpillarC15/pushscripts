@@ -11,6 +11,7 @@ PushScripts supercharges your git workflow with AI. Stop writing commit messages
 - 📝 **Professional Commits**: Perfect conventional commit format every time
 - 🔒 **Security First**: Automatic sensitive file detection
 - 🚀 **Dead Simple**: Just use `push` instead of `git push` and `commit` instead of `git commit`
+- 🔄 **Flexible**: Support for multiple LLM providers (OpenAI, Groq)
 
 ## Installation 📦
 
@@ -18,7 +19,9 @@ PushScripts supercharges your git workflow with AI. Stop writing commit messages
 # Install globally via pnpm (recommended)
 pnpm add -g pushscripts
 
-# Set up your API key
+# Set up your API key (choose one)
+echo "OPENAI_API_KEY=your-api-key" > ~/.pushscripts-rc
+# or
 echo "GROQ_API_KEY=your-api-key" > ~/.pushscripts-rc
 ```
 
@@ -66,16 +69,38 @@ push
 
 ## Configuration ⚙️
 
-Create a `.pushscripts-rc` file in your home directory:
+Create a `.pushscripts-rc` file in your home directory or a `.env` file in your project:
 
 ```bash
-# Required: Your Groq API key
+# Required: Your API key (choose one)
+OPENAI_API_KEY=your-api-key
+# or
 GROQ_API_KEY=your-api-key
 
-# Optional: Customize settings
-COMMIT_MESSAGE_MODEL=llama-3.3-70b-versatile  # Default model
-COMMIT_MESSAGE_TEMPERATURE=0.3                 # Lower = more focused
+# Optional: Choose your LLM provider
+LLM_PROVIDER=openai  # or 'groq'
+
+# Optional: Customize model and settings
+COMMIT_MESSAGE_MODEL=gpt-3.5-turbo  # OpenAI model
+# or
+COMMIT_MESSAGE_MODEL=llama2-70b-chat  # Groq model
+
+COMMIT_MESSAGE_TEMPERATURE=0.3  # Lower = more focused
 ```
+
+### Supported LLM Providers 🤖
+
+PushScripts supports multiple LLM providers for generating commit messages:
+
+1. **OpenAI** (default)
+   - Models: gpt-3.5-turbo, gpt-4, etc.
+   - Set `LLM_PROVIDER=openai` and `OPENAI_API_KEY`
+
+2. **Groq**
+   - Models: llama2-70b-chat, mixtral-8x7b-chat, etc.
+   - Set `LLM_PROVIDER=groq` and `GROQ_API_KEY`
+
+Choose the provider and model that best fits your needs and budget.
 
 ## Development 🛠️
 

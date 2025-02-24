@@ -2,7 +2,7 @@ const { execSync } = require('child_process');
 const fetch = require('node-fetch');
 const debug = require('debug')('pushscripts:*');
 
-class GitPushAI {
+class PushScriptsModel {
   constructor(apiKey) {
     this.apiKey = apiKey;
     this.defaultBranch = process.env.GIT_DEFAULT_BRANCH || 'main';
@@ -10,7 +10,7 @@ class GitPushAI {
     if (process.env.DEBUG === 'pushscripts:*') {
       debug('PushScripts initialized with config:', {
         defaultBranch: this.defaultBranch,
-        model: process.env.COMMIT_MESSAGE_MODEL || 'llama-3.3-70b-versatile',
+        model: process.env.COMMIT_MESSAGE_MODEL || 'gpt-3.5-turbo',
         temperature: process.env.COMMIT_MESSAGE_TEMPERATURE || 0.3
       });
     }
@@ -134,7 +134,7 @@ class GitPushAI {
       const changesDescription = this.formatChangesDescription(categories);
       const diff = execSync('git diff --staged').toString();
 
-      const message = await this.callOpenAIAPI(changesDescription, diff);
+      const message = await this.callLLMAPI(changesDescription, diff);
       return this.validateAndFormatMessage(message);
     } catch (error) {
       console.log('\x1b[33mError generating AI commit message, falling back to basic generation:\x1b[0m', error.message);
@@ -186,39 +186,82 @@ class GitPushAI {
     ].filter(line => !line.endsWith(': ')).join('\n');
   }
 
-  async callOpenAIAPI(changesDescription, diff) {
-    debug('Calling OpenAI API with changes:', changesDescription);
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  async callLLMAPI(changesDescription, diff) {
+    const provider = process.env.LLM_PROVIDER || 'openai';
+    const model = process.env.COMMIT_MESSAGE_MODEL || 'gpt-3.5-turbo';
+    const temperature = parseFloat(process.env.COMMIT_MESSAGE_TEMPERATURE) || 0.3;
+    
+    debug('Calling LLM API with config:', { provider, model, temperature });
+    debug('Changes:', changesDescription);
+
+    let endpoint, headers, body;
+
+    switch (provider.toLowerCase()) {
+      case 'openai':
+        endpoint = 'https://api.openai.com/v1/chat/completions';
+        headers = {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        };
+        body = {
+          model,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a Git commit message expert that generates clear, concise, and informative commit messages following conventional commits format.'
+            },
+            {
+              role: 'user',
+              content: this.buildPrompt(changesDescription)
+            }
+          ],
+          temperature,
+          max_tokens: 200
+        };
+        break;
+
+      case 'groq':
+        endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+        headers = {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        };
+        body = {
+          model,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a Git commit message expert that generates clear, concise, and informative commit messages following conventional commits format.'
+            },
+            {
+              role: 'user',
+              content: this.buildPrompt(changesDescription)
+            }
+          ],
+          temperature,
+          max_tokens: 200
+        };
+        break;
+
+      default:
+        throw new Error(`Unsupported LLM provider: ${provider}`);
+    }
+
+    const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: process.env.COMMIT_MESSAGE_MODEL || 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a Git commit message expert that generates clear, concise, and informative commit messages following conventional commits format.'
-          },
-          {
-            role: 'user',
-            content: this.buildPrompt(changesDescription)
-          }
-        ],
-        temperature: parseFloat(process.env.COMMIT_MESSAGE_TEMPERATURE) || 0.3,
-        max_tokens: 200
-      })
+      headers,
+      body: JSON.stringify(body)
     });
 
     if (!response.ok) {
       debug('API error:', response.statusText);
-      throw new Error(`OpenAI API error: ${response.statusText}`);
+      throw new Error(`${provider} API error: ${response.statusText}`);
     }
 
     const data = await response.json();
-    debug('Generated commit message:', data.choices[0].message.content);
-    return data.choices[0].message.content.trim();
+    const generatedMessage = data.choices[0].message.content.trim();
+    debug('Generated commit message:', generatedMessage);
+    return generatedMessage;
   }
 
   buildPrompt(changesDescription) {
@@ -247,4 +290,4 @@ Generate a commit message that best describes these changes.`;
   }
 }
 
-module.exports = GitPushAI; 
+module.exports = PushScriptsModel; 
