@@ -186,6 +186,22 @@ class PushScriptsModel {
     ].filter(line => !line.endsWith(': ')).join('\n');
   }
 
+  buildPrompt(changesDescription) {
+    return `You are a Git commit message expert. Generate a single line commit message following the Conventional Commits format for these changes:
+
+${changesDescription}
+
+Requirements:
+- Format: type(optional-scope): description
+- Type must be one of: feat, fix, docs, style, refactor, test, chore
+- Description must use imperative mood ("add" not "added")
+- Keep the entire message under 72 characters
+- Focus on the WHAT and WHY, not HOW
+- Be specific but concise
+
+Return ONLY the commit message, nothing else.`;
+  }
+
   async callLLMAPI(changesDescription, diff) {
     const provider = process.env.LLM_PROVIDER || 'openai';
     const model = process.env.COMMIT_MESSAGE_MODEL || 'gpt-3.5-turbo';
@@ -208,7 +224,7 @@ class PushScriptsModel {
           messages: [
             {
               role: 'system',
-              content: 'You are a Git commit message expert that generates clear, concise, and informative commit messages following conventional commits format.'
+              content: 'You are a Git commit message expert. Your task is to generate clear, concise commit messages following the Conventional Commits format. Always respond with just the commit message, no additional text.'
             },
             {
               role: 'user',
@@ -216,7 +232,9 @@ class PushScriptsModel {
             }
           ],
           temperature,
-          max_tokens: 200
+          max_tokens: 60,
+          presence_penalty: 0,
+          frequency_penalty: 0
         };
         break;
 
@@ -254,31 +272,15 @@ class PushScriptsModel {
     });
 
     if (!response.ok) {
-      debug('API error:', response.statusText);
-      throw new Error(`${provider} API error: ${response.statusText}`);
+      const errorText = await response.text();
+      debug('API error:', response.status, response.statusText, errorText);
+      throw new Error(`${provider} API error: ${response.status} - ${response.statusText}`);
     }
 
     const data = await response.json();
     const generatedMessage = data.choices[0].message.content.trim();
     debug('Generated commit message:', generatedMessage);
     return generatedMessage;
-  }
-
-  buildPrompt(changesDescription) {
-    return `As a Git commit message expert, analyze these changes and generate a clear, informative commit message following conventional commits format.
-
-Changes Overview:
-${changesDescription}
-
-Key points:
-1. Use format: type(scope): description
-2. Types: feat, fix, docs, style, refactor, test, chore
-3. Keep first line under 72 chars
-4. Be specific but concise
-5. Focus on WHY and WHAT, not HOW
-6. Use imperative mood ("add" not "added")
-
-Generate a commit message that best describes these changes.`;
   }
 
   validateAndFormatMessage(message) {
