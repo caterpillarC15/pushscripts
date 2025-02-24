@@ -4,7 +4,8 @@
   "description": "Ship code faster with AI-powered git commands. Smart commit messages that understand your code.",
   "main": "src/core/index.js",
   "bin": {
-    "push": "./src/core/cli.js"
+    "push": "./src/core/cli.js",
+    "commit": "./src/core/cli.js"
   },
   "scripts": {
     "start": "node src/core/cli.js",
@@ -16,7 +17,8 @@
     "firebase:serve": "firebase serve",
     "firebase:deploy": "firebase deploy",
     "build": "pnpm install && cp -r website/* public/",
-    "push": "node src/core/cli.js"
+    "push": "node src/core/cli.js",
+    "commit": "node src/core/cli.js"
   },
   "keywords": [
     "git",
@@ -29,7 +31,8 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.0.3",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "debug": "^4.3.4"
   },
   "devDependencies": {
     "jest": "^29.0.0",

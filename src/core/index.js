@@ -1,20 +1,33 @@
 const { execSync } = require('child_process');
 const fetch = require('node-fetch');
+const debug = require('debug')('pushscripts:*');
 
 class GitPushAI {
   constructor(apiKey) {
     this.apiKey = apiKey;
+    this.defaultBranch = process.env.GIT_DEFAULT_BRANCH || 'main';
+    
+    if (process.env.DEBUG === 'pushscripts:*') {
+      debug('PushScripts initialized with config:', {
+        defaultBranch: this.defaultBranch,
+        model: process.env.COMMIT_MESSAGE_MODEL || 'llama2-70b-chat',
+        temperature: process.env.COMMIT_MESSAGE_TEMPERATURE || 0.3
+      });
+    }
   }
 
   getGitStatus() {
+    debug('Getting git status');
     const status = execSync('git status --porcelain').toString();
-    return status
+    const changes = status
       .split('\n')
       .filter(line => line.length > 0)
       .map(line => ({
         status: line.slice(0, 2).trim(),
         file: line.slice(3)
       }));
+    debug('Found changes:', changes);
+    return changes;
   }
 
   categorizeChanges(changes) {
@@ -136,6 +149,7 @@ class GitPushAI {
   }
 
   async callGroqAPI(changesDescription, diff) {
+    debug('Calling Groq API with changes:', changesDescription);
     const response = await fetch('https://api.groq.com/v1/completions', {
       method: 'POST',
       headers: {
@@ -160,10 +174,12 @@ class GitPushAI {
     });
 
     if (!response.ok) {
+      debug('API error:', response.statusText);
       throw new Error(`Groq API error: ${response.statusText}`);
     }
 
     const data = await response.json();
+    debug('Generated commit message:', data.choices[0].message.content);
     return data.choices[0].message.content.trim();
   }
 

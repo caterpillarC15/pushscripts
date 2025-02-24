@@ -76,15 +76,14 @@ pnpm run dev
 
 ### Branch Structure 🌳
 
-We maintain two main branches:
-- `main`: Production-ready code
-- `develop`: Development and feature integration
+We maintain a single main branch:
+- `main`: Production and development code
 
 Development Workflow:
-1. All new features should be developed on `develop` branch
-2. Create feature branches from `develop` for specific features
-3. Development-only files (branding/, devdocs.md) should stay in `develop`
-4. When ready for release, merge `develop` into `main`
+1. Create feature branches from `main` for new features
+2. Submit pull requests to merge changes back into `main`
+3. Keep commits clean and conventional using PushScripts
+4. Ensure all tests pass before merging
 
 ## Project Structure 📁
 
@@ -110,7 +109,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support 💬
 
 Need help? We've got you:
-1. Check the [documentation](https://yourusername.github.io/pushscripts)
+1. Check the [documentation](https://caterpillarC15.github.io/pushscripts)
 2. Open an issue
 3. Join our GitHub discussions
 
