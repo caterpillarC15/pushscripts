@@ -1,498 +1,281 @@
+/**
+ * PushScript - Enhanced Git workflow automation
+ * Main entry point for the pushscript module
+ */
+
 import { execSync } from 'child_process';
-import fetch from 'node-fetch';
-import debug from 'debug';
 import fs from 'fs';
 import path from 'path';
+import dotenv from 'dotenv';
 
-const debugLog = debug('pushscripts:*');
+// Import module components
+import { getProviderConfig, buildApiRequest } from './providers';
+import { checkSensitiveFiles, checkDependencyVulnerabilities, promptUser } from './security';
+import { detectDependencyConflicts, analyzeDependencyConflictsWithLLM } from './dependency';
+import { getGitStatus, categorizeChanges, generateSimpleCommitMessage, getCurrentBranch, confirmPush } from './git';
+import { colorize, logInfo, logSuccess, logWarning, logError, logTitle, logList, displayHelp } from './formatting';
 
-interface GitChange {
-  status: string;
-  file: string;
+/**
+ * Load environment variables from .env.local first, then fall back to .env
+ */
+function loadEnvironmentVariables(): void {
+  const envLocalPath = path.join(process.cwd(), '.env.local');
+  const envPath = path.join(process.cwd(), '.env');
+
+  if (fs.existsSync(envLocalPath)) {
+    dotenv.config({ path: envLocalPath });
+  } else if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+  }
+
+  // Check API key information
+  const providerDetails = getProviderConfig();
+  const { name, apiKey, model } = providerDetails;
+
+  if (!apiKey) {
+    logWarning('No PushScript LLM API key found in .env.local or .env file.');
+    logWarning('AI-powered commit messages will not be available.');
+    logWarning('Please set PUSHSCRIPT_LLM_API_KEY in your .env file.');
+  } else {
+    logSuccess(`PushScript using ${name} for AI commit generation`);
+    
+    if (model) {
+      logSuccess(`Using model: ${model}`);
+    } else {
+      logWarning(`Using ${name} default model (no model specified)`);
+    }
+  }
 }
 
-interface ChangeCategories {
-  added: string[];
-  modified: string[];
-  deleted: string[];
-  renamed: string[];
-  components: Set<string>;
-  features: Set<string>;
-}
+/**
+ * Generate a commit message using an AI provider
+ * @param changes Array of changes from getGitStatus()
+ * @returns Generated commit message
+ */
+async function generateAICommitMessage(changes: any[]): Promise<string> {
+  const providerDetails = getProviderConfig();
+  const { name, apiKey, model } = providerDetails;
+  
+  if (!apiKey) {
+    logWarning('No API key found, falling back to standard message generation');
+    return generateSimpleCommitMessage(changes);
+  }
 
-interface Pattern {
-  pattern: string;
-  original: string;
-}
-
-interface SensitivePatterns {
-  includePatterns: Pattern[];
-  excludePatterns: Pattern[];
-}
-
-interface LLMProviderConfig {
-  endpoint: string;
-  headers: Record<string, string>;
-  body: Record<string, any>;
-}
-
-type ModelProvider = 'openai' | 'groq' | 'anthropic';
-
-class PushScriptsModel {
-  private apiKey: string;
-  private defaultBranch: string;
-  private defaultSensitivePatterns: string[];
-  private defaultModels: Record<ModelProvider, string>;
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    this.defaultBranch = process.env.GIT_DEFAULT_BRANCH || 'main';
+  try {
+    const categories = categorizeChanges(changes);
     
-    // Default sensitive file patterns
-    this.defaultSensitivePatterns = [
-      '.env',
-      '.env.*',
-      'credentials.json',
-      'secrets.json'
-    ];
-    
-    // Default models by provider
-    this.defaultModels = {
-      openai: 'gpt-4-turbo-preview',
-      groq: 'mixtral-8x7b-chat',
-      anthropic: 'claude-3-opus'
-    };
-    
-    if (process.env.DEBUG === 'pushscripts:*') {
-      debugLog('PushScripts initialized with config:', {
-        defaultBranch: this.defaultBranch,
-        provider: process.env.PUSHSCRIPTS_MODEL_PROVIDER || 'openai',
-        model: process.env.PUSHSCRIPTS_MODEL || this.defaultModels.openai,
-        temperature: process.env.PUSHSCRIPTS_TEMPERATURE || 0.3
-      });
-    }
-  }
-
-  addAllChanges(): void {
-    debugLog('Adding all changes');
-    execSync('git add .', { stdio: 'inherit' });
-  }
-
-  async commit(): Promise<string> {
-    // Add all changes first
-    this.addAllChanges();
-
-    // Check for sensitive files
-    const sensitiveFiles = this.checkSensitiveFiles();
-    if (sensitiveFiles.length > 0) {
-      throw new Error('Sensitive files detected');
-    }
-
-    // Get changes
-    const changes = this.getGitStatus();
-    if (changes.length === 0) {
-      throw new Error('No changes to commit');
-    }
-
-    // Generate message
-    const message = await this.generateAICommitMessage(changes);
-    
-    // Commit
-    execSync(`git commit -m "${message}"`, { stdio: 'inherit' });
-    return message;
-  }
-
-  async push(): Promise<string> {
-    // Commit first
-    const message = await this.commit();
-    
-    // Then push
-    execSync('git push', { stdio: 'inherit' });
-    return message;
-  }
-
-  getGitStatus(): GitChange[] {
-    debugLog('Getting git status');
-    const status = execSync('git status --porcelain').toString();
-    const changes = status
-      .split('\n')
-      .filter(line => line.length > 0)
-      .map(line => ({
-        status: line.slice(0, 2).trim(),
-        file: line.slice(3)
-      }));
-    debugLog('Found changes:', changes);
-    return changes;
-  }
-
-  categorizeChanges(changes: GitChange[]): ChangeCategories {
-    const categories: ChangeCategories = {
-      added: [],
-      modified: [],
-      deleted: [],
-      renamed: [],
-      components: new Set<string>(),
-      features: new Set<string>()
-    };
-
-    changes.forEach(change => {
-      const pathParts = change.file.split('/');
-      if (pathParts.includes('components')) {
-        const componentIndex = pathParts.indexOf('components');
-        if (pathParts[componentIndex + 1]) {
-          categories.components.add(pathParts[componentIndex + 1]);
-        }
-      }
-      if (pathParts.includes('features')) {
-        const featureIndex = pathParts.indexOf('features');
-        if (pathParts[featureIndex + 1]) {
-          categories.features.add(pathParts[featureIndex + 1]);
-        }
-      }
-
-      if (change.status.includes('A')) categories.added.push(change.file);
-      else if (change.status.includes('M')) categories.modified.push(change.file);
-      else if (change.status.includes('D')) categories.deleted.push(change.file);
-      else if (change.status.includes('R')) categories.renamed.push(change.file);
-    });
-
-    return categories;
-  }
-
-  getSensitivePatterns(): SensitivePatterns {
-    // Initialize with default patterns
-    let includePatterns: Pattern[] = [...this.defaultSensitivePatterns].map(pattern => ({
-      pattern: this.convertToRegex(pattern),
-      original: pattern
-    }));
-    let excludePatterns: Pattern[] = [];
-    
-    // Check for .gitignore-sensitive file
-    try {
-      const gitignoreSensitivePath = path.join(process.cwd(), '.gitignore-sensitive');
-      if (fs.existsSync(gitignoreSensitivePath)) {
-        debugLog('Found .gitignore-sensitive file');
-        const fileContent = fs.readFileSync(gitignoreSensitivePath, 'utf8');
-        
-        fileContent
-          .split('\n')
-          .map(line => line.trim())
-          .filter(line => line && !line.startsWith('#'))
-          .forEach(pattern => {
-            if (pattern.startsWith('!')) {
-              // Negation pattern
-              const cleanPattern = pattern.slice(1);
-              excludePatterns.push({
-                pattern: this.convertToRegex(cleanPattern),
-                original: cleanPattern
-              });
-              debugLog('Added exclusion pattern:', cleanPattern);
-            } else {
-              // Include pattern
-              includePatterns.push({
-                pattern: this.convertToRegex(pattern),
-                original: pattern
-              });
-              debugLog('Added inclusion pattern:', pattern);
-            }
-          });
-      }
-    } catch (error) {
-      debugLog('Error reading .gitignore-sensitive:', error instanceof Error ? error.message : 'Unknown error');
-    }
-
-    // Check for environment variable override
-    const envPatterns = process.env.PUSHSCRIPTS_SENSITIVE_FILES;
-    if (envPatterns) {
-      debugLog('Found PUSHSCRIPTS_SENSITIVE_FILES environment variable');
-      if (envPatterns.startsWith('override:')) {
-        // Override mode: replace all patterns
-        includePatterns = [];
-        excludePatterns = [];
-        envPatterns
-          .slice(9)
-          .split(',')
-          .map(p => p.trim())
-          .filter(p => p)
-          .forEach(pattern => {
-            if (pattern.startsWith('!')) {
-              excludePatterns.push({
-                pattern: this.convertToRegex(pattern.slice(1)),
-                original: pattern.slice(1)
-              });
-            } else {
-              includePatterns.push({
-                pattern: this.convertToRegex(pattern),
-                original: pattern
-              });
-            }
-          });
-        debugLog('Overriding with patterns:', { include: includePatterns, exclude: excludePatterns });
-      } else {
-        // Append mode: add to existing patterns
-        envPatterns
-          .split(',')
-          .map(p => p.trim())
-          .filter(p => p)
-          .forEach(pattern => {
-            if (pattern.startsWith('!')) {
-              excludePatterns.push({
-                pattern: this.convertToRegex(pattern.slice(1)),
-                original: pattern.slice(1)
-              });
-            } else {
-              includePatterns.push({
-                pattern: this.convertToRegex(pattern),
-                original: pattern
-              });
-            }
-          });
-        debugLog('Appending patterns:', { include: includePatterns, exclude: excludePatterns });
-      }
-    }
-
-    return { includePatterns, excludePatterns };
-  }
-
-  private convertToRegex(pattern: string): string {
-    // Convert gitignore pattern to regex pattern
-    return pattern
-      .replace(/\./g, '\\.')
-      .replace(/\*\*/g, '.*')
-      .replace(/\*/g, '[^/]*')
-      .replace(/\?/g, '.')
-      .replace(/\[!/g, '[^')
-      .replace(/\[/g, '\\[')
-      .replace(/\]/g, '\\]')
-      .replace(/\//g, '\\/');
-  }
-
-  checkSensitiveFiles(): string[] {
-    const { includePatterns, excludePatterns } = this.getSensitivePatterns();
-    debugLog('Checking for sensitive files with patterns:', { 
-      include: includePatterns.map(p => p.original),
-      exclude: excludePatterns.map(p => p.original)
-    });
-
-    const status = execSync('git status --porcelain').toString();
-    const stagedFiles = status
-      .split('\n')
-      .filter(line => line.length > 0)
-      .map(line => line.slice(3));
-
-    const sensitiveFiles = stagedFiles.filter(file => {
-      // Check if file matches any include pattern
-      const isIncluded = includePatterns.some(({ pattern }) => new RegExp(pattern).test(file));
-      
-      // If included, check if it's explicitly excluded
-      if (isIncluded) {
-        const isExcluded = excludePatterns.some(({ pattern }) => new RegExp(pattern).test(file));
-        return !isExcluded;
-      }
-      
-      return false;
-    });
-
-    if (sensitiveFiles.length > 0) {
-      debugLog('Found sensitive files:', sensitiveFiles);
-    }
-
-    return sensitiveFiles;
-  }
-
-  async generateAICommitMessage(changes: GitChange[]): Promise<string> {
-    if (!this.apiKey) {
-      return this.generateBasicCommitMessage(changes);
-    }
-
-    try {
-      const categories = this.categorizeChanges(changes);
-      const changesDescription = this.formatChangesDescription(categories);
-      const diff = execSync('git diff --staged').toString();
-
-      const message = await this.callLLMAPI(changesDescription, diff);
-      return this.validateAndFormatMessage(message);
-    } catch (error) {
-      console.log('\x1b[33mError generating AI commit message, falling back to basic generation:\x1b[0m', error instanceof Error ? error.message : 'Unknown error');
-      return this.generateBasicCommitMessage(changes);
-    }
-  }
-
-  generateBasicCommitMessage(changes: GitChange[]): string {
-    const categories = this.categorizeChanges(changes);
-    
-    let type = 'chore';
-    let scope = '';
-    let description = '';
-
-    const isMainlyModifications = categories.modified.length > categories.added.length;
-
-    if (isMainlyModifications) {
-      if (categories.modified.some(f => f.includes('style') || f.includes('css'))) {
-        type = 'style';
-        description = 'update styling';
-      } else if (categories.components.size > 0) {
-        type = 'fix';
-        scope = 'ui';
-        description = 'update components';
-      } else {
-        type = 'fix';
-        description = 'update implementation';
-      }
-    } else if (categories.added.length > 0) {
-      type = 'feat';
-      if (categories.components.size === 1) {
-        scope = 'ui';
-        description = `add ${Array.from(categories.components)[0]}`;
-      } else {
-        description = 'add new features';
-      }
-    }
-
-    return scope ? `${type}(${scope}): ${description}` : `${type}: ${description}`;
-  }
-
-  private formatChangesDescription(categories: ChangeCategories): string {
-    return [
+    // Create a detailed description of changes
+    const changesDescription = [
       `Modified files: ${categories.modified.join(', ')}`,
       `Added files: ${categories.added.join(', ')}`,
       `Deleted files: ${categories.deleted.join(', ')}`,
       `Components affected: ${Array.from(categories.components).join(', ')}`,
       `Features affected: ${Array.from(categories.features).join(', ')}`
     ].filter(line => !line.endsWith(': ')).join('\n');
-  }
 
-  private buildPrompt(changesDescription: string): string {
-    return `You are a Git commit message expert. Generate a single line commit message following the Conventional Commits format for these changes:
+    // Get git diff but limit its size
+    let diff = execSync('git diff --staged').toString();
+    // If diff is too large, only include file names and stats
+    if (diff.length > 2000) {
+      diff = execSync('git diff --staged --stat').toString();
+      logWarning('Diff too large, using summary instead');
+    }
 
+    const prompt = `As a senior developer, create a concise git commit message for these changes.
+Focus on the key changes and their purpose. Keep it brief but informative.
+
+Changes Overview:
 ${changesDescription}
 
-Requirements:
-- Format: type(optional-scope): description
-- Type must be one of: feat, fix, docs, style, refactor, test, chore
-- Description must use imperative mood ("add" not "added")
-- Keep the entire message under 72 characters
-- Focus on the WHAT and WHY, not HOW
-- Be specific but concise
+${diff.length > 2000 ? 'Changes Summary:' : 'Git Diff:'}
+\`\`\`
+${diff.substring(0, 2000)}${diff.length > 2000 ? '...' : ''}
+\`\`\`
 
-Return ONLY the commit message, nothing else.`;
-  }
+Follow conventional commits format:
+type(scope): concise summary
 
-  private async callLLMAPI(changesDescription: string, diff: string): Promise<string> {
-    const provider = (process.env.PUSHSCRIPTS_MODEL_PROVIDER || 'openai') as ModelProvider;
-    const model = process.env.PUSHSCRIPTS_MODEL || this.defaultModels[provider];
-    const temperature = parseFloat(process.env.PUSHSCRIPTS_TEMPERATURE || '0.3');
-    
-    debugLog('Calling LLM API with config:', { provider, model, temperature });
-    debugLog('Changes:', changesDescription);
+Where type is one of: feat, fix, docs, style, refactor, perf, test, chore
+Keep the first line under 80 characters.`;
 
-    let config: LLMProviderConfig;
-
-    switch (provider.toLowerCase()) {
-      case 'openai':
-        config = {
-          endpoint: 'https://api.openai.com/v1/chat/completions',
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json',
-            'OpenAI-Beta': 'assistants=v1'
-          },
-          body: {
-            model,
-            messages: [
-              {
-                role: 'system',
-                content: 'You are a Git commit message expert. Your task is to generate clear, concise commit messages following the Conventional Commits format. Always respond with just the commit message, no additional text.'
-              },
-              {
-                role: 'user',
-                content: this.buildPrompt(changesDescription)
-              }
-            ],
-            temperature,
-            max_tokens: 60,
-            presence_penalty: 0,
-            frequency_penalty: 0,
-            response_format: { type: "text" }
+    try {
+      logInfo(`Generating commit message using ${name}${model ? '/' + model : ' (default model)'}...`);
+      
+      // Use the buildApiRequest helper to create the request
+      const { request, endpoint } = await buildApiRequest(providerDetails, prompt, 150);
+      
+      // Send the API request
+      const response = await fetch(endpoint, request);
+      
+      // Handle errors with detailed information
+      if (!response.ok) {
+        let errorDetails = '';
+        try {
+          const errorJson = await response.json();
+          errorDetails = JSON.stringify(errorJson, null, 2);
+        } catch (e) {
+          try {
+            errorDetails = await response.text();
+          } catch (e2) {
+            errorDetails = `Status: ${response.status} ${response.statusText}`;
           }
-        };
-        break;
+        }
+        
+        logError(`API request failed: ${errorDetails}`);
+        throw new Error(`API request failed: ${errorDetails}`);
+      }
 
-      case 'groq':
-        config = {
-          endpoint: 'https://api.groq.com/openai/v1/chat/completions',
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: {
-            model,
-            messages: [
-              {
-                role: 'system',
-                content: 'You are a Git commit message expert that generates clear, concise, and informative commit messages following conventional commits format.'
-              },
-              {
-                role: 'user',
-                content: this.buildPrompt(changesDescription)
-              }
-            ],
-            temperature,
-            max_tokens: 200
-          }
-        };
-        break;
+      const data = await response.json();
+      const config = providerDetails.config;
+      const message = config.responseHandler(data);
+      
+      // Validate the message format - allowing for more detailed messages
+      const firstLine = message.split('\n')[0];
+      if (!/^(feat|fix|docs|style|refactor|perf|test|chore)(\([a-z-]+\))?: .+/.test(firstLine)) {
+        logWarning('AI generated message does not match conventional format, falling back to standard generation');
+        return generateSimpleCommitMessage(changes);
+      }
 
-      case 'anthropic':
-        config = {
-          endpoint: 'https://api.anthropic.com/v1/messages',
-          headers: {
-            'x-api-key': this.apiKey,
-            'anthropic-version': '2023-06-01',
-            'content-type': 'application/json'
-          },
-          body: {
-            model,
-            messages: [
-              {
-                role: 'user',
-                content: this.buildPrompt(changesDescription)
-              }
-            ],
-            max_tokens: 200
-          }
-        };
-        break;
+      if (firstLine.length > 80) {
+        logWarning('AI generated message first line exceeds 80 characters, falling back to standard generation');
+        return generateSimpleCommitMessage(changes);
+      }
 
-      default:
-        throw new Error(`Unsupported LLM provider: ${provider}`);
+      logSuccess(`AI Generated Commit Message:`);
+      message.split('\n').forEach(line => console.log(colorize(line, 'white')));
+      
+      return message;
+
+    } catch (error) {
+      logError(`${name} API Error: ${error}`);
+      return generateSimpleCommitMessage(changes);
     }
 
-    const response = await fetch(config.endpoint, {
-      method: 'POST',
-      headers: config.headers,
-      body: JSON.stringify(config.body)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      debugLog('API error:', response.status, response.statusText, errorText);
-      throw new Error(`${provider} API error: ${response.status} - ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const generatedMessage = data.choices[0].message.content.trim();
-    debugLog('Generated commit message:', generatedMessage);
-    return generatedMessage;
-  }
-
-  private validateAndFormatMessage(message: string): string {
-    if (!/^(feat|fix|docs|style|refactor|test|chore)(\([a-z-]+\))?: .+/.test(message)) {
-      console.log('\x1b[33mAI generated message does not match conventional format, falling back to basic generation\x1b[0m');
-      return this.generateBasicCommitMessage(this.getGitStatus());
-    }
-    return message;
+  } catch (error) {
+    logWarning(`Error generating AI commit message, falling back to standard generation: ${error}`);
+    return generateSimpleCommitMessage(changes);
   }
 }
 
-export default PushScriptsModel; 
+/**
+ * Add all changes to git staging
+ */
+function addAllChanges(): void {
+  logInfo('Adding all changes');
+  try {
+    execSync('git add .', { stdio: 'inherit' });
+  } catch (error) {
+    logError(`Error adding changes: ${error}`);
+    throw error;
+  }
+}
+
+/**
+ * Commit changes with the given message or generate one
+ * @param message Optional commit message
+ * @returns Generated or provided commit message
+ */
+export async function commit(message?: string): Promise<string> {
+  loadEnvironmentVariables();
+  
+  // Add all changes first
+  addAllChanges();
+
+  // Check for sensitive files
+  const sensitiveFiles = checkSensitiveFiles();
+  if (sensitiveFiles.length > 0) {
+    logError('Sensitive files detected:');
+    sensitiveFiles.forEach(file => {
+      logWarning(`- ${file}`);
+    });
+    
+    const proceed = await promptUser('These files might contain sensitive data. Continue anyway?');
+    if (!proceed) {
+      throw new Error('Commit aborted due to sensitive files');
+    }
+  }
+
+  // Get changes
+  const changes = getGitStatus();
+  if (changes.length === 0) {
+    logWarning('No changes to commit');
+    throw new Error('No changes to commit');
+  }
+
+  // Check for dependency conflicts
+  const conflicts = detectDependencyConflicts();
+  if (conflicts.length > 0) {
+    logWarning('Dependency conflicts detected:');
+    conflicts.forEach(conflict => {
+      logWarning(`- ${conflict}`);
+    });
+    
+    // Optionally analyze with LLM
+    const analyze = await promptUser('Would you like AI to analyze these conflicts?');
+    if (analyze) {
+      const analysis = await analyzeDependencyConflictsWithLLM(conflicts);
+      logInfo('Dependency Analysis:');
+      console.log(colorize(analysis, 'white'));
+    }
+    
+    const proceed = await promptUser('Continue with commit despite dependency conflicts?');
+    if (!proceed) {
+      throw new Error('Commit aborted due to dependency conflicts');
+    }
+  }
+
+  // Generate or use provided message
+  const finalMessage = message || await generateAICommitMessage(changes);
+  
+  // Commit
+  try {
+    logInfo(`Committing changes with message: "${finalMessage.split('\n')[0]}"`);
+    execSync(`git commit -m "${finalMessage.replace(/"/g, '\\"')}"`, { stdio: 'inherit' });
+    logSuccess('Changes committed successfully');
+    return finalMessage;
+  } catch (error) {
+    logError(`Error committing changes: ${error}`);
+    throw error;
+  }
+}
+
+/**
+ * Push changes to remote
+ * @param message Optional commit message
+ * @param branch Optional branch name
+ * @returns Commit message
+ */
+export async function push(message?: string, branch?: string): Promise<string> {
+  // Commit first
+  const commitMessage = await commit(message);
+  
+  // Get current branch
+  const currentBranch = branch || getCurrentBranch();
+  
+  // Confirm push
+  const shouldPush = await confirmPush();
+  if (!shouldPush) {
+    logInfo('Push cancelled');
+    return commitMessage;
+  }
+  
+  // Then push
+  try {
+    logInfo(`Pushing to ${currentBranch}...`);
+    execSync(`git push origin ${currentBranch}`, { stdio: 'inherit' });
+    logSuccess(`Successfully pushed to ${currentBranch}`);
+    return commitMessage;
+  } catch (error) {
+    logError(`Error pushing changes: ${error}`);
+    throw error;
+  }
+}
+
+// Export core functionality
+export { getGitStatus, categorizeChanges, generateSimpleCommitMessage };
+export { checkSensitiveFiles, checkDependencyVulnerabilities };
+export { detectDependencyConflicts, analyzeDependencyConflictsWithLLM };
+export { logInfo, logSuccess, logWarning, logError, logTitle, logList, displayHelp };
+
+// Initialize environment variables when module is loaded
+loadEnvironmentVariables(); 

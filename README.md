@@ -315,5 +315,28 @@ Need help? We've got you:
 - The AI provider community for their powerful language models
 - The open-source community for inspiration and support
 
+## Building and Testing
+
+To build and test the project:
+
+```bash
+# Install dependencies
+pnpm install
+
+# Run TypeScript type check
+pnpm run type-check
+
+# Build the project
+pnpm run build
+
+# Run tests
+pnpm test
+
+# Run the CLI
+pnpm run push
+# or
+pnpm run commit
+```
+
 ---
 Made with ❤️ by the PushScripts Team
